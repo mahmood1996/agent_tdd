@@ -1,0 +1,8 @@
+# agent-tdd Configuration
+runner: "dart"
+test_command: "dart test"
+analyze_command: "dart analyze"
+test_files: "test/**/*_test.dart"
+source_files: "lib/**/*.dart"
+fail_on_warnings: true
+git_commit: true

@@ -1,0 +1,8 @@
+# agent-tdd Feature Specs Backlog
+specs:
+  - id: 1
+    title: "Sample Feature Spec - Replace with your own"
+    status: red
+  - id: 2
+    title: "Calculate sum of numbers"
+    status: pending

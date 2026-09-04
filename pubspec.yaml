@@ -1,0 +1,25 @@
+name: agent_tdd
+description: A TDD Harness & State Machine CLI for AI Agents and Developers, supporting multi-language test runners, spec backlog tracking, and static analysis verification.
+version: 1.0.0
+homepage: https://github.com/example/agent_tdd
+publish_to: none
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  args: ^2.5.0
+  yaml: ^3.1.2
+  crypto: ^3.0.3
+  path: ^1.9.0
+  glob: ^2.1.2
+  agent_harness:
+    path: packages/agent_harness
+  agent_file_snapshot:
+    path: packages/agent_file_snapshot
+  agent_backlog:
+    path: packages/agent_backlog
+
+dev_dependencies:
+  test: ^1.25.0
+  lints: ^3.0.0
