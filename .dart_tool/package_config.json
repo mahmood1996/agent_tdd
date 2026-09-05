@@ -11,19 +11,19 @@
       "name": "agent_backlog",
       "rootUri": "../packages/agent_backlog",
       "packageUri": "lib/",
-      "languageVersion": "3.0"
+      "languageVersion": "3.3"
     },
     {
       "name": "agent_file_snapshot",
       "rootUri": "../packages/agent_file_snapshot",
       "packageUri": "lib/",
-      "languageVersion": "3.0"
+      "languageVersion": "3.3"
     },
     {
       "name": "agent_harness",
       "rootUri": "../packages/agent_harness",
       "packageUri": "lib/",
-      "languageVersion": "3.0"
+      "languageVersion": "3.3"
     },
     {
       "name": "analyzer",
@@ -311,7 +311,7 @@
       "name": "agent_tdd",
       "rootUri": "../",
       "packageUri": "lib/",
-      "languageVersion": "3.0"
+      "languageVersion": "3.3"
     }
   ],
   "generator": "pub",

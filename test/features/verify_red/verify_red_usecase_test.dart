@@ -57,13 +57,10 @@ void main() {
     test('execute transitions to alreadyPassed phase when tests pass during RED phase', () async {
       final specStore = SpecStore(projectDir: harness.tempDir.path);
       await specStore.addSpec('Spec 1');
-      final cycle = TddCycle(projectDir: harness.tempDir.path);
-      await cycle.save(TddState(
-        phase: TddPhase.red,
+      final store = FileStateStore(projectDir: harness.tempDir.path);
+      await store.saveState(TddHarnessState.red(
         activeSpecId: 1,
         activeSpecTitle: 'Spec 1',
-        startedAt: DateTime.now(),
-        lastUpdated: DateTime.now(),
       ));
 
       final mockRunner = MockTestRunVerifications(
@@ -89,7 +86,7 @@ void main() {
 
       final res = await useCase.execute();
       expect(res.success, isTrue);
-      expect(res.state.phase, equals(TddPhase.alreadyPassed));
+      expect(res.state.isAlreadyPassed, isTrue);
       expect(res.message, contains('Test PASSED! Spec requirement is already satisfied'));
 
       final updatedSpec = await specStore.activeSpec();
@@ -102,13 +99,10 @@ void main() {
 
       final specStore = SpecStore(projectDir: harness.tempDir.path);
       await specStore.addSpec('Spec 1');
-      final cycle = TddCycle(projectDir: harness.tempDir.path);
-      await cycle.save(TddState(
-        phase: TddPhase.red,
+      final store = FileStateStore(projectDir: harness.tempDir.path);
+      await store.saveState(TddHarnessState.red(
         activeSpecId: 1,
         activeSpecTitle: 'Spec 1',
-        startedAt: DateTime.now(),
-        lastUpdated: DateTime.now(),
       ));
 
       final mockRunner = MockTestRunVerifications(
@@ -137,7 +131,7 @@ void main() {
       final res = await useCase.execute();
 
       expect(res.success, isTrue);
-      expect(res.state.phase, equals(TddPhase.green));
+      expect(res.state.isGreen, isTrue);
       expect(res.message, contains('RED state verified! Phase advanced to GREEN.'));
       expect(mockGit.lastCommitMessage, contains('🔴 RED: Spec #1 Spec 1'));
 

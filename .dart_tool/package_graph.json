@@ -76,7 +76,9 @@
     {
       "name": "agent_harness",
       "version": "1.0.0",
-      "dependencies": []
+      "dependencies": [
+        "path"
+      ]
     },
     {
       "name": "glob",

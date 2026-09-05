@@ -30,17 +30,7 @@ class MockTestRunVerifications extends TestRunVerifications {
   }
 }
 
-class CliRunnerTestHarness extends BaseTest {
-  @override
-  void onSetUp() {
-    Logger.jsonOutput = true;
-  }
-
-  @override
-  void onTearDown() {
-    Logger.jsonOutput = false;
-  }
-}
+class CliRunnerTestHarness extends BaseTest {}
 
 void main() {
   final harness = CliRunnerTestHarness()..setUpBase('cli_runner_json_test_');
@@ -55,6 +45,7 @@ void main() {
       );
       expect(json['success'], isTrue);
       expect(json['phase'], equals('IDLE'));
+      expect(json['allowed_actions']['allowed_commands'], equals(['agent-tdd next', 'agent-tdd specs', 'agent-tdd status', 'agent-tdd reset']));
       expect(
         json['instructions_for_agent'],
         contains('initialized successfully'),
@@ -72,6 +63,7 @@ void main() {
       expect(json['success'], isTrue);
       expect(json['phase'], equals('IDLE'));
       expect(json['progress'], isNotNull);
+      expect(json['allowed_actions']['allowed_commands'], equals(['agent-tdd next', 'agent-tdd specs', 'agent-tdd status', 'agent-tdd reset']));
       expect(json['instructions_for_agent'], equals('Specs backlog listed.'));
     });
 
@@ -136,6 +128,7 @@ void main() {
       expect(json['success'], isTrue);
       expect(json['phase'], equals('RED'));
       expect(json['allowed_actions'], isNotNull);
+      expect(json['allowed_actions']['allowed_commands'], equals(['agent-tdd verify-red', 'agent-tdd status', 'agent-tdd reset']));
     });
 
     test(

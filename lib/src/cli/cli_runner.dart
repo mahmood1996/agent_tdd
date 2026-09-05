@@ -1,7 +1,7 @@
+import 'package:agent_harness/agent_harness.dart';
 import '../core/data/config_store.dart';
 import '../core/data/snapshot_store.dart';
 import '../core/data/spec_store.dart';
-import '../core/data/tdd_cycle.dart';
 import '../core/services/analyzer.dart';
 import '../core/services/git_client.dart';
 import '../core/services/test_run_verifications.dart';
@@ -9,85 +9,80 @@ import 'commands/init_command.dart';
 import 'commands/lifecycle_commands.dart';
 import 'commands/specs_command.dart';
 import 'commands/verification_commands.dart';
-import 'presenter/fallback_presenter.dart';
-import 'presenter/init_presenter.dart';
-import 'presenter/lifecycle_presenter.dart';
-import 'presenter/specs_presenter.dart';
-import 'presenter/verification_presenter.dart';
 
 final class CliRunner {
   final String projectDir;
   final ConfigStore configStore;
   final SpecStore specStore;
-  final TddCycle tddCycle;
+  final StateStore stateStore;
   final SnapshotStore snapshotStore;
   final TestRunVerifications testRunVerifications;
   final Analyzer analyzer;
   final GitClient gitClient;
+  final HarnessOutput output;
 
   final InitCommand _initCommand;
   final SpecsCommand _specsCommand;
   final VerificationCommands _verificationCommands;
   final LifecycleCommands _lifecycleCommands;
-  final FallbackPresenter _fallbackPresenter;
 
   CliRunner({
     required this.projectDir,
     ConfigStore? configStore,
     SpecStore? specStore,
-    TddCycle? tddCycle,
+    StateStore? stateStore,
     SnapshotStore? snapshotStore,
     TestRunVerifications? testRunVerifications,
     Analyzer? analyzer,
     GitClient? gitClient,
-    InitPresenter initPresenter = const InitPresenter(),
-    SpecsPresenter specsPresenter = const SpecsPresenter(),
-    VerificationPresenter verificationPresenter = const VerificationPresenter(),
-    LifecyclePresenter lifecyclePresenter = const LifecyclePresenter(),
-    FallbackPresenter fallbackPresenter = const FallbackPresenter(),
+    HarnessOutput output = const ConsoleOutput(isJsonMode: true),
   })  : configStore = configStore ?? ConfigStore(projectDir: projectDir),
         specStore = specStore ?? SpecStore(projectDir: projectDir),
-        tddCycle = tddCycle ?? TddCycle(projectDir: projectDir),
+        stateStore =
+            stateStore ?? FileStateStore(projectDir: projectDir),
         snapshotStore = snapshotStore ?? SnapshotStore(projectDir: projectDir),
         testRunVerifications = testRunVerifications ??
             TestRunVerifications(projectDir, configStore: configStore),
         analyzer = analyzer ??
             Analyzer(projectDir: projectDir, configStore: configStore),
         gitClient = gitClient ?? GitClient(projectDir: projectDir),
-        _fallbackPresenter = fallbackPresenter,
+        output = output,
         _initCommand = InitCommand(
           projectDir: projectDir,
           configStore: configStore ?? ConfigStore(projectDir: projectDir),
           specStore: specStore ?? SpecStore(projectDir: projectDir),
-          presenter: initPresenter,
+          output: output,
         ),
         _specsCommand = SpecsCommand(
           projectDir: projectDir,
           specStore: specStore ?? SpecStore(projectDir: projectDir),
-          tddCycle: tddCycle ?? TddCycle(projectDir: projectDir),
-          presenter: specsPresenter,
+          stateStore:
+              stateStore ?? FileStateStore(projectDir: projectDir),
+          output: output,
         ),
         _verificationCommands = VerificationCommands(
           projectDir: projectDir,
           configStore: configStore ?? ConfigStore(projectDir: projectDir),
           specStore: specStore ?? SpecStore(projectDir: projectDir),
-          tddCycle: tddCycle ?? TddCycle(projectDir: projectDir),
+          stateStore:
+              stateStore ?? FileStateStore(projectDir: projectDir),
           snapshotStore: snapshotStore ?? SnapshotStore(projectDir: projectDir),
           testRunVerifications: testRunVerifications ??
               TestRunVerifications(projectDir, configStore: configStore),
           analyzer: analyzer ??
               Analyzer(projectDir: projectDir, configStore: configStore),
           gitClient: gitClient ?? GitClient(projectDir: projectDir),
-          presenter: verificationPresenter,
+          output: output,
         ),
         _lifecycleCommands = LifecycleCommands(
           projectDir: projectDir,
           configStore: configStore ?? ConfigStore(projectDir: projectDir),
           specStore: specStore ?? SpecStore(projectDir: projectDir),
-          tddCycle: tddCycle ?? TddCycle(projectDir: projectDir),
+          stateStore:
+              stateStore ?? FileStateStore(projectDir: projectDir),
           snapshotStore: snapshotStore ?? SnapshotStore(projectDir: projectDir),
           gitClient: gitClient ?? GitClient(projectDir: projectDir),
-          presenter: lifecyclePresenter,
+          output: output,
         );
 
   /// Executes the specified CLI [command] with any accompanying [restArgs].
@@ -142,10 +137,10 @@ final class CliRunner {
         break;
 
       default:
-        final state = await tddCycle.savedTddState();
-        _fallbackPresenter.renderUnknownCommand(
-          command,
-          state.phase.name.toUpperCase(),
+        final state = await stateStore.harnessState();
+        output.reportFailure(
+          error: 'Unknown command "$command". Run "agent-tdd --help" for available commands.',
+          state: state,
         );
         break;
     }

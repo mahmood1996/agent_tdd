@@ -1,14 +1,14 @@
+import 'package:agent_harness/agent_harness.dart';
 import '../../../core/data/config_store.dart';
-import '../../../core/data/tdd_cycle.dart';
 import '../../../core/domain/analysis_issue.dart';
 import '../../../core/domain/tdd_config.dart';
-import '../../../core/domain/tdd_state.dart';
+import '../../../core/domain/tdd_state_extensions.dart';
 import '../../../core/services/analyzer.dart';
 import '../../../core/services/test_run_verifications.dart';
 
 final class VerifyRefactorResult {
   final bool success;
-  final TddState state;
+  final HarnessState state;
   final TddConfig? config;
   final List<AnalysisIssue> analysisIssues;
   final String message;
@@ -25,28 +25,29 @@ final class VerifyRefactorResult {
 final class VerifyRefactorUseCase {
   final String projectDir;
   final ConfigStore configStore;
-  final TddCycle tddCycle;
+  final StateStore stateStore;
   final TestRunVerifications testRunVerifications;
   final Analyzer analyzer;
 
   VerifyRefactorUseCase({
     required this.projectDir,
     ConfigStore? configStore,
-    TddCycle? tddCycle,
+    StateStore? stateStore,
     TestRunVerifications? testRunVerifications,
     Analyzer? analyzer,
   })  : configStore = configStore ?? ConfigStore(projectDir: projectDir),
-        tddCycle = tddCycle ?? TddCycle(projectDir: projectDir),
+        stateStore =
+            stateStore ?? FileStateStore(projectDir: projectDir),
         testRunVerifications = testRunVerifications ??
             TestRunVerifications(projectDir, configStore: configStore),
         analyzer = analyzer ??
             Analyzer(projectDir: projectDir, configStore: configStore);
 
   Future<VerifyRefactorResult> execute() async {
-    final state = await tddCycle.savedTddState();
-    if (state.phase != TddPhase.refactor) {
+    final state = await stateStore.harnessState();
+    if (!state.isRefactor) {
       final msg =
-          'verify-refactor can only be run during REFACTOR phase (Current phase: ${state.phase.name.toUpperCase()}).';
+          'verify-refactor can only be run during REFACTOR phase (Current phase: ${state.phase}).';
       return VerifyRefactorResult(
         success: false,
         state: state,

@@ -7,7 +7,7 @@ class MemoryStateStore implements StateStore {
   MemoryStateStore(this._state);
 
   @override
-  Future<HarnessState> loadState() async => _state;
+  Future<HarnessState> harnessState() async => _state;
 
   @override
   Future<void> saveState(HarnessState state) async {
@@ -38,7 +38,7 @@ class SampleCommand implements HarnessCommand {
 
   @override
   Future<void> execute() async {
-    final state = await stateStore.loadState();
+    final state = await stateStore.harnessState();
     final newState = state.copyWith(
       phase: 'GREEN',
       editablePatterns: ['lib/**/*.dart'],
@@ -56,15 +56,18 @@ void main() {
         editablePatterns: ['test/**/*.dart'],
         readOnlyPatterns: ['lib/**/*.dart'],
         nextCommand: 'verify-red',
+        allowedCommands: ['verify-red', 'reset', 'status'],
       );
 
       final json = state.toJson();
       expect(json['phase'], equals('RED'));
       expect(json['next_command'], equals('verify-red'));
+      expect(json['allowed_commands'], equals(['verify-red', 'reset', 'status']));
 
       final parsed = HarnessState.fromJson(json);
       expect(parsed.phase, equals('RED'));
       expect(parsed.editablePatterns, contains('test/**/*.dart'));
+      expect(parsed.allowedCommands, equals(['verify-red', 'reset', 'status']));
     });
 
     test('ConsoleOutput json reporting', () {
@@ -78,6 +81,7 @@ void main() {
         phase: 'GREEN',
         editablePatterns: ['lib/**/*.dart'],
         readOnlyPatterns: ['test/**/*.dart'],
+        allowedCommands: ['verify-green', 'reset'],
       );
 
       output.reportSuccess(message: 'Tests passed', state: state);
@@ -85,6 +89,7 @@ void main() {
       expect(outputs.length, equals(1));
       expect(outputs.first, contains('"success":true'));
       expect(outputs.first, contains('"phase":"GREEN"'));
+      expect(outputs.first, contains('"allowed_commands":["verify-green","reset"]'));
     });
 
     test('SampleCommand executes and updates StateStore', () async {
@@ -103,7 +108,7 @@ void main() {
       final command = SampleCommand(store, output);
       await command.execute();
 
-      final updatedState = await store.loadState();
+      final updatedState = await store.harnessState();
       expect(updatedState.phase, equals('GREEN'));
       expect(outputs.first, contains('"phase":"GREEN"'));
     });

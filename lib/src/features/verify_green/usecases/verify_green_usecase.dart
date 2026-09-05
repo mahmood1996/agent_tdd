@@ -1,15 +1,15 @@
+import 'package:agent_harness/agent_harness.dart';
 import '../../../core/data/config_store.dart';
 import '../../../core/data/snapshot_store.dart';
 import '../../../core/data/spec_store.dart';
-import '../../../core/data/tdd_cycle.dart';
 import '../../../core/domain/tdd_config.dart';
-import '../../../core/domain/tdd_state.dart';
+import '../../../core/domain/tdd_state_extensions.dart';
 import '../../../core/services/git_client.dart';
 import '../../../core/services/test_run_verifications.dart';
 
 final class VerifyGreenResult {
   final bool success;
-  final TddState state;
+  final HarnessState state;
   final TddConfig? config;
   final List<String> violations;
   final String message;
@@ -27,7 +27,7 @@ final class VerifyGreenUseCase {
   final String projectDir;
   final ConfigStore configStore;
   final SpecStore specStore;
-  final TddCycle tddCycle;
+  final StateStore stateStore;
   final SnapshotStore snapshotStore;
   final TestRunVerifications testRunVerifications;
   final GitClient gitClient;
@@ -36,23 +36,24 @@ final class VerifyGreenUseCase {
     required this.projectDir,
     ConfigStore? configStore,
     SpecStore? specStore,
-    TddCycle? tddCycle,
+    StateStore? stateStore,
     SnapshotStore? snapshotStore,
     TestRunVerifications? testRunVerifications,
     GitClient? gitClient,
   })  : configStore = configStore ?? ConfigStore(projectDir: projectDir),
         specStore = specStore ?? SpecStore(projectDir: projectDir),
-        tddCycle = tddCycle ?? TddCycle(projectDir: projectDir),
+        stateStore =
+            stateStore ?? FileStateStore(projectDir: projectDir),
         snapshotStore = snapshotStore ?? SnapshotStore(projectDir: projectDir),
         testRunVerifications = testRunVerifications ??
             TestRunVerifications(projectDir, configStore: configStore),
         gitClient = gitClient ?? GitClient(projectDir: projectDir);
 
   Future<VerifyGreenResult> execute() async {
-    final state = await tddCycle.savedTddState();
-    if (state.phase != TddPhase.green) {
+    final state = await stateStore.harnessState();
+    if (!state.isGreen) {
       final msg =
-          'verify-green can only be run during GREEN phase (Current phase: ${state.phase.name.toUpperCase()}).';
+          'verify-green can only be run during GREEN phase (Current phase: ${state.phase}).';
       return VerifyGreenResult(
         success: false,
         state: state,
@@ -87,11 +88,12 @@ final class VerifyGreenUseCase {
       );
     }
 
-    final newState = state.copyWith(
-      phase: TddPhase.refactor,
-      lastUpdated: DateTime.now(),
+    final newState = TddHarnessState.refactor(
+      activeSpecId: state.activeSpecId ?? 0,
+      activeSpecTitle: state.activeSpecTitle ?? '',
+      startedAt: state.startedAt,
     );
-    await tddCycle.save(newState);
+    await stateStore.saveState(newState);
 
     if (state.activeSpecId != null) {
       await specStore.updateSpecStatus(state.activeSpecId!, 'refactor');

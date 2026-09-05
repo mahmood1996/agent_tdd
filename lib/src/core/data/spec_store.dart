@@ -1,9 +1,10 @@
 import 'dart:io';
+import 'package:agent_backlog/agent_backlog.dart';
 import 'package:path/path.dart' as p;
 import 'package:yaml/yaml.dart';
 import '../domain/spec_item.dart';
 
-final class SpecStore {
+final class SpecStore implements TaskStore {
   SpecStore({
     required String projectDir,
     String fileName = 'specs.yaml',
@@ -11,8 +12,60 @@ final class SpecStore {
         _projectDir = projectDir;
 
   final String _fileName;
-
   final String _projectDir;
+
+  @override
+  Future<List<HarnessTask>> loadTasks() async {
+    final list = await specs();
+    return list
+        .map((s) => HarnessTask(
+              id: s.id,
+              title: s.title,
+              status: s.status,
+              metadata: s.description != null ? {'description': s.description} : const {},
+            ))
+        .toList();
+  }
+
+  @override
+  Future<void> saveTasks(List<HarnessTask> tasks) async {
+    final specItems = tasks
+        .map((t) => SpecItem(
+              id: t.id,
+              title: t.title,
+              status: t.status,
+              description: t.metadata['description']?.toString(),
+            ))
+        .toList();
+    await _save(specItems);
+  }
+
+  @override
+  Future<HarnessTask?> getNextPendingTask() async {
+    final spec = await nextPendingSpec();
+    if (spec == null) return null;
+    return HarnessTask(id: spec.id, title: spec.title, status: spec.status);
+  }
+
+  @override
+  Future<void> markTaskDone(int taskId) async {
+    await updateSpecStatus(taskId, 'done');
+  }
+
+  @override
+  Future<List<HarnessTask>> importFromMarkdown(String markdownContent) async {
+    final parsed = MarkdownTaskParser.parse(markdownContent);
+    for (final task in parsed) {
+      await addSpec(task.title);
+      if (task.isDone) {
+        final currentSpecs = await specs();
+        if (currentSpecs.isNotEmpty) {
+          await updateSpecStatus(currentSpecs.last.id, 'done');
+        }
+      }
+    }
+    return await loadTasks();
+  }
 
   Future<List<SpecItem>> specs() async {
     final file = _specsFile;
@@ -66,27 +119,8 @@ final class SpecStore {
       throw Exception('Markdown file not found: $markdownPath');
     }
 
-    final lines = await file.readAsLines();
-    for (final line in lines) {
-      final trimmed = line.trim();
-      final isPending =
-          trimmed.startsWith('- [ ]') || trimmed.startsWith('* [ ]');
-      final isDone = trimmed.startsWith('- [x]') || trimmed.startsWith('* [x]');
-
-      if (!isPending && !isDone) continue;
-
-      final title = trimmed.substring(5).trim();
-      if (title.isEmpty) continue;
-
-      await addSpec(title);
-      if (isDone) {
-        final currentSpecs = await specs();
-        if (currentSpecs.isNotEmpty) {
-          final lastSpec = currentSpecs.last;
-          await updateSpecStatus(lastSpec.id, 'done');
-        }
-      }
-    }
+    final content = await file.readAsString();
+    await importFromMarkdown(content);
   }
 
   Future<void> _save(List<SpecItem> items) async {

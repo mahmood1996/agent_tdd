@@ -8,13 +8,10 @@ void main() {
 
   group('ResetCycleUseCase Behavioral Solitary Unit Tests', () {
     test('execute resets cycle state from active phase back to IDLE', () async {
-      final cycle = TddCycle(projectDir: harness.tempDir.path);
-      await cycle.save(TddState(
-        phase: TddPhase.green,
+      final store = FileStateStore(projectDir: harness.tempDir.path);
+      await store.saveState(TddHarnessState.green(
         activeSpecId: 5,
         activeSpecTitle: 'Broken feature',
-        startedAt: DateTime.now(),
-        lastUpdated: DateTime.now(),
       ));
 
       final useCase = ResetCycleUseCase(projectDir: harness.tempDir.path);
@@ -22,8 +19,8 @@ void main() {
 
       expect(res.success, isTrue);
 
-      final state = await cycle.savedTddState();
-      expect(state.phase, equals(TddPhase.idle));
+      final state = await store.harnessState();
+      expect(state.isIdle, isTrue);
       expect(state.activeSpecId, isNull);
     });
   });

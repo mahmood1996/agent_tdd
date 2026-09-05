@@ -3,7 +3,7 @@ import 'harness_state.dart';
 /// Abstract interface for persistent state storage
 abstract interface class StateStore {
   /// Loads persistent harness state
-  Future<HarnessState> loadState();
+  Future<HarnessState> harnessState();
 
   /// Saves persistent harness state
   Future<void> saveState(HarnessState state);

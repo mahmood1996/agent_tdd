@@ -62,13 +62,10 @@ void main() {
       final snapshot = await snapshotStore.capture('test/**/*.dart');
       await snapshotStore.save(snapshot);
 
-      final cycle = TddCycle(projectDir: harness.tempDir.path);
-      await cycle.save(TddState(
-        phase: TddPhase.green,
+      final store = FileStateStore(projectDir: harness.tempDir.path);
+      await store.saveState(TddHarnessState.green(
         activeSpecId: 1,
         activeSpecTitle: 'Spec 1',
-        startedAt: DateTime.now(),
-        lastUpdated: DateTime.now(),
       ));
 
       testFile.writeAsStringSync('void main() { print("modified!"); }');
@@ -89,13 +86,10 @@ void main() {
       final snapshot = await snapshotStore.capture('test/**/*.dart');
       await snapshotStore.save(snapshot);
 
-      final cycle = TddCycle(projectDir: harness.tempDir.path);
-      await cycle.save(TddState(
-        phase: TddPhase.green,
+      final store = FileStateStore(projectDir: harness.tempDir.path);
+      await store.saveState(TddHarnessState.green(
         activeSpecId: 1,
         activeSpecTitle: 'Spec 1',
-        startedAt: DateTime.now(),
-        lastUpdated: DateTime.now(),
       ));
 
       final mockRunner = MockTestRunVerifications(
@@ -134,13 +128,10 @@ void main() {
       final specStore = SpecStore(projectDir: harness.tempDir.path);
       await specStore.addSpec('Spec 1');
 
-      final cycle = TddCycle(projectDir: harness.tempDir.path);
-      await cycle.save(TddState(
-        phase: TddPhase.green,
+      final store = FileStateStore(projectDir: harness.tempDir.path);
+      await store.saveState(TddHarnessState.green(
         activeSpecId: 1,
         activeSpecTitle: 'Spec 1',
-        startedAt: DateTime.now(),
-        lastUpdated: DateTime.now(),
       ));
 
       final mockRunner = MockTestRunVerifications(
@@ -168,7 +159,7 @@ void main() {
       final res = await useCase.execute();
 
       expect(res.success, isTrue);
-      expect(res.state.phase, equals(TddPhase.refactor));
+      expect(res.state.isRefactor, isTrue);
       expect(res.message, contains('GREEN state verified! Phase advanced to REFACTOR.'));
       expect(mockGit.lastCommitMessage, contains('🟢 GREEN: Spec #1 Spec 1'));
 

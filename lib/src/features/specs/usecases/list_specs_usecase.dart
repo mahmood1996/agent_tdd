@@ -1,10 +1,9 @@
+import 'package:agent_harness/agent_harness.dart';
 import '../../../core/data/spec_store.dart';
-import '../../../core/data/tdd_cycle.dart';
 import '../../../core/domain/spec_item.dart';
-import '../../../core/domain/tdd_state.dart';
 
 final class ListSpecsResult {
-  final TddState currentState;
+  final HarnessState currentState;
   final Map<String, dynamic> summary;
   final List<SpecItem> specs;
 
@@ -18,17 +17,18 @@ final class ListSpecsResult {
 final class ListSpecsUseCase {
   final String projectDir;
   final SpecStore specStore;
-  final TddCycle tddCycle;
+  final StateStore stateStore;
 
   ListSpecsUseCase({
     required this.projectDir,
     SpecStore? specStore,
-    TddCycle? tddCycle,
+    StateStore? stateStore,
   })  : specStore = specStore ?? SpecStore(projectDir: projectDir),
-        tddCycle = tddCycle ?? TddCycle(projectDir: projectDir);
+        stateStore =
+            stateStore ?? FileStateStore(projectDir: projectDir);
 
   Future<ListSpecsResult> execute() async {
-    final currentState = await tddCycle.savedTddState();
+    final currentState = await stateStore.harnessState();
     final summary = await specStore.summary();
     final specs = await specStore.specs();
 
@@ -39,5 +39,3 @@ final class ListSpecsUseCase {
     );
   }
 }
-
-

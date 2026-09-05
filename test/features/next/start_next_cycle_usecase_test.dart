@@ -13,7 +13,7 @@ void main() {
 
       expect(res.success, isFalse);
       expect(res.message, contains('No pending specs found'));
-      expect(res.currentState.phase, equals(TddPhase.idle));
+      expect(res.currentState.isIdle, isTrue);
     });
 
     test('execute succeeds, picks next pending spec, and transitions to RED phase', () async {
@@ -24,7 +24,7 @@ void main() {
       final res = await useCase.execute();
 
       expect(res.success, isTrue);
-      expect(res.currentState.phase, equals(TddPhase.red));
+      expect(res.currentState.isRed, isTrue);
       expect(res.activeSpec?.id, equals(1));
       expect(res.activeSpec?.title, equals('Build User Profile'));
     });

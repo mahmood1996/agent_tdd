@@ -1,13 +1,13 @@
+import 'package:agent_harness/agent_harness.dart';
 import '../../../core/data/config_store.dart';
 import '../../../core/data/spec_store.dart';
-import '../../../core/data/tdd_cycle.dart';
 import '../../../core/domain/spec_item.dart';
 import '../../../core/domain/tdd_config.dart';
-import '../../../core/domain/tdd_state.dart';
+import '../../../core/domain/tdd_state_extensions.dart';
 
 final class StartNextCycleResult {
   final bool success;
-  final TddState currentState;
+  final HarnessState currentState;
   final SpecItem? activeSpec;
   final TddConfig? config;
   final String message;
@@ -25,23 +25,24 @@ final class StartNextCycleUseCase {
   final String projectDir;
   final ConfigStore configStore;
   final SpecStore specStore;
-  final TddCycle tddCycle;
+  final StateStore stateStore;
 
   StartNextCycleUseCase({
     required this.projectDir,
     ConfigStore? configStore,
     SpecStore? specStore,
-    TddCycle? tddCycle,
+    StateStore? stateStore,
   })  : configStore = configStore ?? ConfigStore(projectDir: projectDir),
         specStore = specStore ?? SpecStore(projectDir: projectDir),
-        tddCycle = tddCycle ?? TddCycle(projectDir: projectDir);
+        stateStore =
+            stateStore ?? FileStateStore(projectDir: projectDir);
 
   Future<StartNextCycleResult> execute() async {
-    final currentState = await tddCycle.savedTddState();
+    final currentState = await stateStore.harnessState();
 
-    if (currentState.phase != TddPhase.idle) {
+    if (!currentState.isIdle) {
       final msg =
-          'Cannot start next spec while another cycle is in progress (Current phase: ${currentState.phase.name.toUpperCase()}). Complete or reset current cycle first.';
+          'Cannot start next spec while another cycle is in progress (Current phase: ${currentState.phase}). Complete or reset current cycle first.';
       return StartNextCycleResult(
         success: false,
         currentState: currentState,
@@ -60,14 +61,11 @@ final class StartNextCycleUseCase {
       );
     }
 
-    final newState = TddState(
-      phase: TddPhase.red,
+    final newState = TddHarnessState.red(
       activeSpecId: pendingSpec.id,
       activeSpecTitle: pendingSpec.title,
-      startedAt: DateTime.now(),
-      lastUpdated: DateTime.now(),
     );
-    await tddCycle.save(newState);
+    await stateStore.saveState(newState);
     await specStore.updateSpecStatus(pendingSpec.id, 'red');
 
     final config = await configStore.config();
@@ -81,5 +79,3 @@ final class StartNextCycleUseCase {
     );
   }
 }
-
-

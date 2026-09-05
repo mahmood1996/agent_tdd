@@ -1,11 +1,10 @@
+import 'package:agent_harness/agent_harness.dart';
 import '../../../core/data/config_store.dart';
 import '../../../core/data/spec_store.dart';
-import '../../../core/data/tdd_cycle.dart';
 import '../../../core/domain/tdd_config.dart';
-import '../../../core/domain/tdd_state.dart';
 
 final class GetStatusResult {
-  final TddState state;
+  final HarnessState state;
   final TddConfig config;
   final Map<String, dynamic> summary;
 
@@ -20,19 +19,20 @@ final class GetStatusUseCase {
   final String projectDir;
   final ConfigStore configStore;
   final SpecStore specStore;
-  final TddCycle tddCycle;
+  final StateStore stateStore;
 
   GetStatusUseCase({
     required this.projectDir,
     ConfigStore? configStore,
     SpecStore? specStore,
-    TddCycle? tddCycle,
+    StateStore? stateStore,
   })  : configStore = configStore ?? ConfigStore(projectDir: projectDir),
         specStore = specStore ?? SpecStore(projectDir: projectDir),
-        tddCycle = tddCycle ?? TddCycle(projectDir: projectDir);
+        stateStore =
+            stateStore ?? FileStateStore(projectDir: projectDir);
 
   Future<GetStatusResult> execute() async {
-    final state = await tddCycle.savedTddState();
+    final state = await stateStore.harnessState();
     final config = await configStore.config();
     final summary = await specStore.summary();
 
@@ -43,5 +43,3 @@ final class GetStatusUseCase {
     );
   }
 }
-
-

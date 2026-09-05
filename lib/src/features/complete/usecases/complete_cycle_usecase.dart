@@ -1,13 +1,13 @@
+import 'package:agent_harness/agent_harness.dart';
 import '../../../core/data/config_store.dart';
 import '../../../core/data/snapshot_store.dart';
 import '../../../core/data/spec_store.dart';
-import '../../../core/data/tdd_cycle.dart';
-import '../../../core/domain/tdd_state.dart';
+import '../../../core/domain/tdd_state_extensions.dart';
 import '../../../core/services/git_client.dart';
 
 final class CompleteCycleResult {
   final bool success;
-  final TddState currentState;
+  final HarnessState currentState;
   final int? completedSpecId;
   final String? completedSpecTitle;
   final Map<String, dynamic> summary;
@@ -27,7 +27,7 @@ final class CompleteCycleUseCase {
   final String projectDir;
   final ConfigStore configStore;
   final SpecStore specStore;
-  final TddCycle tddCycle;
+  final StateStore stateStore;
   final SnapshotStore snapshotStore;
   final GitClient gitClient;
 
@@ -35,22 +35,23 @@ final class CompleteCycleUseCase {
     required this.projectDir,
     ConfigStore? configStore,
     SpecStore? specStore,
-    TddCycle? tddCycle,
+    StateStore? stateStore,
     SnapshotStore? snapshotStore,
     GitClient? gitClient,
   })  : configStore = configStore ?? ConfigStore(projectDir: projectDir),
         specStore = specStore ?? SpecStore(projectDir: projectDir),
-        tddCycle = tddCycle ?? TddCycle(projectDir: projectDir),
+        stateStore =
+            stateStore ?? FileStateStore(projectDir: projectDir),
         snapshotStore = snapshotStore ?? SnapshotStore(projectDir: projectDir),
         gitClient = gitClient ?? GitClient(projectDir: projectDir);
 
   Future<CompleteCycleResult> execute() async {
-    final state = await tddCycle.savedTddState();
-    final isAlreadyPassed = state.phase == TddPhase.alreadyPassed;
+    final state = await stateStore.harnessState();
+    final isAlreadyPassed = state.isAlreadyPassed;
 
-    if (state.phase != TddPhase.refactor && !isAlreadyPassed) {
+    if (!state.isRefactor && !isAlreadyPassed) {
       final msg =
-          'complete can only be run after verifying REFACTOR phase (Current phase: ${state.phase.name.toUpperCase()}). Run verify-refactor first.';
+          'complete can only be run after verifying REFACTOR phase (Current phase: ${state.phase}). Run verify-refactor first.';
       final summary = await specStore.summary();
       return CompleteCycleResult(
         success: false,
@@ -76,10 +77,10 @@ final class CompleteCycleUseCase {
     }
 
     await snapshotStore.delete();
-    await tddCycle.reset();
+    await stateStore.resetState();
 
     final summary = await specStore.summary();
-    final resetState = await tddCycle.savedTddState();
+    final resetState = await stateStore.harnessState();
 
     final messageStr = isAlreadyPassed
         ? 'Spec #$activeId was already satisfied and marked DONE! Run "agent-tdd next" to pick up the next pending spec item.'
@@ -95,5 +96,3 @@ final class CompleteCycleUseCase {
     );
   }
 }
-
-

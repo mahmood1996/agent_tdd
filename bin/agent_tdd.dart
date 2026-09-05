@@ -1,7 +1,7 @@
 import 'dart:io';
-import 'package:args/args.dart';
+import 'package:agent_harness/agent_harness.dart';
 import 'package:agent_tdd/src/cli/cli_runner.dart';
-import 'package:agent_tdd/src/cli/logger.dart';
+import 'package:args/args.dart';
 
 void main(List<String> arguments) async {
   final parser = ArgParser()
@@ -17,15 +17,27 @@ void main(List<String> arguments) async {
     exit(1);
   }
 
-  Logger.jsonOutput = results['json'] == true;
+  final isJsonMode = results['json'] == true;
+  final output = ConsoleOutput(isJsonMode: isJsonMode);
 
   if (results['help'] == true || results.rest.isEmpty) {
-    if (Logger.jsonOutput) {
-      Logger.agentJson(
-        success: true,
-        phase: 'IDLE',
-        instructionsForAgent:
+    if (isJsonMode) {
+      output.reportSuccess(
+        message:
             'agent-tdd usage: agent-tdd <command> [options]. Commands: init, specs, next, verify-red, verify-green, verify-refactor, complete, status, reset.',
+        state: const HarnessState(
+          phase: 'IDLE',
+          editablePatterns: [],
+          readOnlyPatterns: [],
+          nextCommand: 'agent-tdd next',
+          allowedCommands: [
+            'agent-tdd init',
+            'agent-tdd specs',
+            'agent-tdd next',
+            'agent-tdd status',
+            'agent-tdd reset',
+          ],
+        ),
       );
       return;
     }
@@ -35,7 +47,7 @@ void main(List<String> arguments) async {
 
   final projectDir = results['project-dir']?.toString() ?? Directory.current.path;
 
-  final runner = CliRunner(projectDir: projectDir);
+  final runner = CliRunner(projectDir: projectDir, output: output);
   final command = results.rest.first;
   final restArgs = results.rest.sublist(1);
 

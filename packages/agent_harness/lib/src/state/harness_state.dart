@@ -1,9 +1,15 @@
 /// Value object representing active workflow state
 final class HarnessState {
   final String phase;
-  final List<String> editablePatterns;
-  final List<String> readOnlyPatterns;
+
   final String? nextCommand;
+
+  final List<String> allowedCommands;
+
+  final List<String> editablePatterns;
+
+  final List<String> readOnlyPatterns;
+
   final Map<String, dynamic> metadata;
 
   const HarnessState({
@@ -11,6 +17,7 @@ final class HarnessState {
     required this.editablePatterns,
     required this.readOnlyPatterns,
     this.nextCommand,
+    this.allowedCommands = const [],
     this.metadata = const {},
   });
 
@@ -19,6 +26,7 @@ final class HarnessState {
     List<String>? editablePatterns,
     List<String>? readOnlyPatterns,
     String? nextCommand,
+    List<String>? allowedCommands,
     Map<String, dynamic>? metadata,
   }) {
     return HarnessState(
@@ -26,6 +34,7 @@ final class HarnessState {
       editablePatterns: editablePatterns ?? this.editablePatterns,
       readOnlyPatterns: readOnlyPatterns ?? this.readOnlyPatterns,
       nextCommand: nextCommand ?? this.nextCommand,
+      allowedCommands: allowedCommands ?? this.allowedCommands,
       metadata: metadata ?? this.metadata,
     );
   }
@@ -36,6 +45,7 @@ final class HarnessState {
       'editable_patterns': editablePatterns,
       'read_only_patterns': readOnlyPatterns,
       if (nextCommand != null) 'next_command': nextCommand,
+      if (allowedCommands.isNotEmpty) 'allowed_commands': allowedCommands,
       'metadata': metadata,
     };
   }
@@ -52,6 +62,10 @@ final class HarnessState {
               .toList() ??
           const [],
       nextCommand: json['next_command']?.toString(),
+      allowedCommands: (json['allowed_commands'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          const [],
       metadata: (json['metadata'] as Map<String, dynamic>?) ?? const {},
     );
   }

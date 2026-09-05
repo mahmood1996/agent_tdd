@@ -23,7 +23,7 @@ final class ConsoleOutput implements HarnessOutput {
   final bool isJsonMode;
   final void Function(String text)? printHandler;
 
-  ConsoleOutput({
+  const ConsoleOutput({
     this.isJsonMode = false,
     this.printHandler,
   });
@@ -56,12 +56,16 @@ final class ConsoleOutput implements HarnessOutput {
     if (isJsonMode) {
       final jsonOutput = {
         'success': true,
-        'message': message,
         'phase': state.phase,
+        ...state.metadata,
         'allowed_actions': {
-          'editable_files': state.editablePatterns,
-          'read_only_files': state.readOnlyPatterns,
+          if (state.editablePatterns.isNotEmpty)
+            'editable_files': state.editablePatterns,
+          if (state.readOnlyPatterns.isNotEmpty)
+            'read_only_files': state.readOnlyPatterns,
           if (state.nextCommand != null) 'next_command': state.nextCommand,
+          if (state.allowedCommands.isNotEmpty)
+            'allowed_commands': state.allowedCommands,
         },
         'instructions_for_agent': message,
       };
@@ -76,14 +80,25 @@ final class ConsoleOutput implements HarnessOutput {
     if (isJsonMode) {
       final jsonOutput = {
         'success': false,
-        'error': error,
         'phase': state.phase,
-        'allowed_actions': {
-          'editable_files': state.editablePatterns,
-          'read_only_files': state.readOnlyPatterns,
-          if (state.nextCommand != null) 'next_command': state.nextCommand,
-        },
-        'instructions_for_agent': 'Fix error: $error',
+        if (state.metadata.containsKey('active_spec'))
+          'active_spec': state.metadata['active_spec'],
+        if (state.metadata.containsKey('progress'))
+          'progress': state.metadata['progress'],
+        if (state.metadata.containsKey('issues'))
+          'issues': state.metadata['issues'],
+        if (state.editablePatterns.isNotEmpty ||
+            state.readOnlyPatterns.isNotEmpty ||
+            state.nextCommand != null ||
+            state.allowedCommands.isNotEmpty)
+          'allowed_actions': {
+            'editable_files': state.editablePatterns,
+            'read_only_files': state.readOnlyPatterns,
+            if (state.nextCommand != null) 'next_command': state.nextCommand,
+            if (state.allowedCommands.isNotEmpty)
+              'allowed_commands': state.allowedCommands,
+          },
+        'instructions_for_agent': error,
       };
       _print(jsonEncode(jsonOutput));
     } else {

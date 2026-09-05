@@ -35,13 +35,10 @@ void main() {
       await specStore.addSpec('Spec 1');
       await specStore.updateSpecStatus(1, 'refactor');
 
-      final cycle = TddCycle(projectDir: harness.tempDir.path);
-      await cycle.save(TddState(
-        phase: TddPhase.refactor,
+      final store = FileStateStore(projectDir: harness.tempDir.path);
+      await store.saveState(TddHarnessState.refactor(
         activeSpecId: 1,
         activeSpecTitle: 'Spec 1',
-        startedAt: DateTime.now(),
-        lastUpdated: DateTime.now(),
       ));
 
       final snapshotStore = SnapshotStore(projectDir: harness.tempDir.path);
@@ -63,7 +60,7 @@ void main() {
       expect(res.success, isTrue);
       expect(res.completedSpecId, equals(1));
       expect(res.completedSpecTitle, equals('Spec 1'));
-      expect(res.currentState.phase, equals(TddPhase.idle));
+      expect(res.currentState.isIdle, isTrue);
       expect(snapshotFile.existsSync(), isFalse);
       expect(mockGit.lastCommitMessage, contains('🎉 DONE (spec-1): Spec 1'));
 
@@ -79,13 +76,10 @@ void main() {
       await specStore.addSpec('Spec 1');
       await specStore.updateSpecStatus(1, 'already_passed');
 
-      final cycle = TddCycle(projectDir: harness.tempDir.path);
-      await cycle.save(TddState(
-        phase: TddPhase.alreadyPassed,
+      final store = FileStateStore(projectDir: harness.tempDir.path);
+      await store.saveState(TddHarnessState.alreadyPassed(
         activeSpecId: 1,
         activeSpecTitle: 'Spec 1',
-        startedAt: DateTime.now(),
-        lastUpdated: DateTime.now(),
       ));
 
       final mockGit = MockGitClient(projectDir: harness.tempDir.path);
@@ -99,7 +93,7 @@ void main() {
 
       expect(res.success, isTrue);
       expect(res.completedSpecId, equals(1));
-      expect(res.currentState.phase, equals(TddPhase.idle));
+      expect(res.currentState.isIdle, isTrue);
       expect(mockGit.lastCommitMessage, contains('🎉 DONE (spec-1): Spec 1 (already satisfied)'));
 
       final allSpecs = await specStore.specs();

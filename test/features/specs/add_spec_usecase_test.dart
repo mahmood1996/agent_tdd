@@ -15,7 +15,7 @@ void main() {
       expect(res.newSpec.title, equals('User Authentication'));
       expect(res.newSpec.description, equals('Implement JWT login'));
       expect(res.newSpec.status, equals('pending'));
-      expect(res.currentState.phase, equals(TddPhase.idle));
+      expect(res.currentState.isIdle, isTrue);
     });
 
     test('execute increments ID for multiple specs', () async {
