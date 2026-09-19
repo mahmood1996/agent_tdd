@@ -1,5 +1,5 @@
 import 'dart:convert';
-import '../state/harness_state.dart';
+import '../models/harness_state.dart';
 
 /// Abstract interface for terminal and machine-readable JSON stdout/stderr reporting
 abstract interface class HarnessOutput {
@@ -28,13 +28,7 @@ final class ConsoleOutput implements HarnessOutput {
     this.printHandler,
   });
 
-  void _print(String text) {
-    if (printHandler != null) {
-      printHandler!(text);
-    } else {
-      print(text);
-    }
-  }
+  void _print(String text) => (printHandler ?? print).call(text);
 
   @override
   void info(String message) {
@@ -53,41 +47,15 @@ final class ConsoleOutput implements HarnessOutput {
 
   @override
   void reportSuccess({required String message, required HarnessState state}) {
-    if (isJsonMode) {
-      final jsonOutput = {
-        'success': true,
-        'message': message,
-        'phase': state.phase,
-        'allowed_actions': {
-          'editable_files': state.editablePatterns,
-          'read_only_files': state.readOnlyPatterns,
-          if (state.nextCommand != null) 'next_command': state.nextCommand,
-        },
-        'instructions_for_agent': message,
-      };
-      _print(jsonEncode(jsonOutput));
-    } else {
-      info('[${state.phase}] $message');
-    }
+    isJsonMode
+        ? _print(jsonEncode(state.toSuccessJson(message)))
+        : info('[${state.phase}] $message');
   }
 
   @override
   void reportFailure({required String error, required HarnessState state}) {
-    if (isJsonMode) {
-      final jsonOutput = {
-        'success': false,
-        'error': error,
-        'phase': state.phase,
-        'allowed_actions': {
-          'editable_files': state.editablePatterns,
-          'read_only_files': state.readOnlyPatterns,
-          if (state.nextCommand != null) 'next_command': state.nextCommand,
-        },
-        'instructions_for_agent': 'Fix error: $error',
-      };
-      _print(jsonEncode(jsonOutput));
-    } else {
-      this.error('[${state.phase}] $error');
-    }
+    isJsonMode
+        ? _print(jsonEncode(state.toFailureJson(error)))
+        : this.error('[${state.phase}] $error');
   }
 }
