@@ -4,56 +4,45 @@ import 'package:agent_file_snapshot/agent_file_snapshot.dart';
 import 'package:path/path.dart' as p;
 
 final class SnapshotStore {
-  SnapshotStore({required String projectDir})
-      : _projectDir = projectDir,
-        _engine = FileSnapshotEngine();
+  SnapshotStore({required String projectDir}) : _projectDir = projectDir;
 
   final String _projectDir;
-  final FileSnapshotEngine _engine;
 
   static const String snapshotFileName = '.agent_tdd_snapshot.json';
 
   Future<FileSnapshot> capture(String globPattern) async {
-    return await _engine.computeHashes([globPattern], baseDir: _projectDir);
+    return PatternFileSnapshot(
+      patterns: [globPattern],
+      baseDir: _projectDir,
+    );
   }
 
   Future<void> save(FileSnapshot snapshot) async {
     final file = File(p.join(_projectDir, snapshotFileName));
-    await file.writeAsString(jsonEncode(snapshot.toJson()));
+    final hashes = await snapshot.hashes();
+    await file.writeAsString(jsonEncode(hashes));
   }
 
   Future<List<String>> verifyIntegrity(String globPattern) async {
     final original = await _savedSnapshot();
     if (original == null) return [];
 
+    final originalHashes = await original.hashes();
+    if (originalHashes.isEmpty) return [];
+
     final current = await capture(globPattern);
-    final diff = original.compareTo(current);
+    final currentHashes = await current.hashes();
 
-    final violations = <String>[];
-    for (final file in diff.modifiedFiles) {
-      violations.add('$file (MODIFIED)');
-    }
-    for (final file in diff.deletedFiles) {
-      violations.add('$file (DELETED)');
-    }
-    for (final file in diff.addedFiles) {
-      violations.add('$file (ADDED)');
-    }
-
-    return violations;
+    return FileSnapshotDiff(
+      originalHashes: originalHashes,
+      currentHashes: currentHashes,
+    ).violations;
   }
 
   Future<FileSnapshot?> _savedSnapshot() async {
     final file = File(p.join(_projectDir, snapshotFileName));
     if (!await file.exists()) return null;
-
-    try {
-      final content = await file.readAsString();
-      final json = jsonDecode(content) as Map<String, dynamic>;
-      return FileSnapshot.fromJson(json);
-    } catch (_) {
-      return null;
-    }
+    return JsonFileSnapshot(file);
   }
 
   Future<void> delete() async {
@@ -61,4 +50,12 @@ final class SnapshotStore {
     if (!await file.exists()) return;
     await file.delete();
   }
+}
+
+extension ViolationsOfDiff on FileSnapshotDiff {
+  List<String> get violations => [
+        ...modifiedFiles.map((e) => '$e (MODIFIED)'),
+        ...deletedFiles.map((e) => '$e (DELETED)'),
+        ...addedFiles.map((e) => '$e (ADDED)'),
+      ];
 }
