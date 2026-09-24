@@ -11,27 +11,23 @@ final class SnapshotStore {
   static const String snapshotFileName = '.agent_tdd_snapshot.json';
 
   Future<FileSnapshot> capture(String globPattern) async {
-    return PatternFileSnapshot(
-      patterns: [globPattern],
-      baseDir: _projectDir,
-    );
+    return DiskFileIndex(baseDir: _projectDir).snapshotOf([globPattern]);
   }
 
   Future<void> save(FileSnapshot snapshot) async {
     final file = File(p.join(_projectDir, snapshotFileName));
-    final hashes = await snapshot.hashes();
-    await file.writeAsString(jsonEncode(hashes));
+    await file.writeAsString(jsonEncode(snapshot.fingerprints));
   }
 
   Future<List<String>> verifyIntegrity(String globPattern) async {
     final original = await _savedSnapshot();
     if (original == null) return [];
 
-    final originalHashes = await original.hashes();
+    final originalHashes = original.fingerprints;
     if (originalHashes.isEmpty) return [];
 
     final current = await capture(globPattern);
-    final currentHashes = await current.hashes();
+    final currentHashes = current.fingerprints;
 
     return FileSnapshotDiff(
       originalHashes: originalHashes,
@@ -41,8 +37,12 @@ final class SnapshotStore {
 
   Future<FileSnapshot?> _savedSnapshot() async {
     final file = File(p.join(_projectDir, snapshotFileName));
-    if (!await file.exists()) return null;
-    return JsonFileSnapshot(file);
+
+    return await file.exists()
+        ? FileSnapshot(
+            Map<String, String>.from(jsonDecode(await file.readAsString())),
+          )
+        : null;
   }
 
   Future<void> delete() async {
@@ -53,9 +53,11 @@ final class SnapshotStore {
 }
 
 extension ViolationsOfDiff on FileSnapshotDiff {
-  List<String> get violations => [
-        ...modifiedFiles.map((e) => '$e (MODIFIED)'),
-        ...deletedFiles.map((e) => '$e (DELETED)'),
-        ...addedFiles.map((e) => '$e (ADDED)'),
-      ];
+  List<String> get violations {
+    return [
+      ...modifiedFiles.map((e) => '$e (MODIFIED)'),
+      ...deletedFiles.map((e) => '$e (DELETED)'),
+      ...addedFiles.map((e) => '$e (ADDED)'),
+    ];
+  }
 }

@@ -1,51 +1,48 @@
-import 'dart:io';
-import 'package:crypto/crypto.dart';
-import 'package:path/path.dart' as p;
-
 import '../file_snapshot_diff/file_snapshot_diff.dart';
-import 'pattern_file_snapshot.dart';
 
-/// Abstract interface contract for capturing cryptographic file snapshots
+/// Abstract interface representing a point-in-time state of a set of files.
+///
+/// A [FileSnapshot] is a pure value object — it holds already-computed
+/// fingerprints and performs no I/O. Use [FileIndex] to produce a snapshot
+/// from disk.
 abstract interface class FileSnapshot {
-  Future<Map<String, String>> hashes();
+  /// The paths of all files captured in this snapshot.
+  Iterable<String> get filePaths;
+
+  /// Returns the fingerprint (SHA-256 hash) of [filePath] in this snapshot.
+  String fingerprint(String filePath);
+
+  /// Creates a [FileSnapshot] from a map of file paths to fingerprints.
+  factory FileSnapshot(Map<String, String> fingerprints) = _FileSnapshotImpl;
 }
 
-/// Helper extensions on [FileSnapshot]
+/// Helper extensions on [FileSnapshot].
 extension SmartFileSnapshot on FileSnapshot {
-  /// Computes difference between this snapshot and another snapshot
-  Future<FileSnapshotDiff> diff(FileSnapshot other) async {
-    return FileSnapshotDiff(
-      originalHashes: await hashes(),
-      currentHashes: await other.hashes(),
-    );
-  }
+  /// Returns the full path → fingerprint map for this snapshot.
+  ///
+  /// Symmetric pair with [filePaths] and [fingerprint]:
+  /// - [filePaths] — all paths
+  /// - [fingerprint] — one fingerprint by path
+  /// - [fingerprints] — all fingerprints as a map
+  Map<String, String> get fingerprints => {
+        for (final path in filePaths) path: fingerprint(path),
+      };
 
-  /// Checks if all files in this snapshot remain 100% unchanged on disk
-  Future<bool> isUnchanged({String? baseDir}) async {
-    final fileHashes = await hashes();
-    final rootPath = baseDir ?? Directory.current.path;
+  /// Computes the difference between this snapshot and [other].
+  FileSnapshotDiff diff(FileSnapshot other) => FileSnapshotDiff(
+        originalHashes: fingerprints,
+        currentHashes: other.fingerprints,
+      );
+}
 
-    for (final entry in fileHashes.entries) {
-      final file = File(p.join(rootPath, entry.key));
+final class _FileSnapshotImpl implements FileSnapshot {
+  final Map<String, String> _fingerprints;
 
-      if (!await file.exists()) return false;
+  const _FileSnapshotImpl(this._fingerprints);
 
-      final stream = file.openRead();
-      final currentHash = (await sha256.bind(stream).first).toString();
+  @override
+  Iterable<String> get filePaths => _fingerprints.keys;
 
-      if (currentHash != entry.value) return false;
-    }
-
-    return true;
-  }
-
-  /// Computes a diff between this snapshot and current state on disk
-  Future<FileSnapshotDiff> diffFromDisk({String? baseDir}) async {
-    return diff(
-      PatternFileSnapshot(
-        patterns: (await hashes()).keys.toList(),
-        baseDir: baseDir,
-      ),
-    );
-  }
+  @override
+  String fingerprint(String filePath) => _fingerprints[filePath] ?? '';
 }
