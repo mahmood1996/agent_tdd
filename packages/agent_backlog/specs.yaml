@@ -5,4 +5,4 @@ specs:
     status: green
   - id: 2
     title: "Migrate FileTaskStore to persist tasks as YAML instead of JSON"
-    status: green
+    status: refactor

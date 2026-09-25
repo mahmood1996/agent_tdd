@@ -1,11 +1,12 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:path/path.dart' as p;
+import 'package:yaml/yaml.dart';
+import 'package:yaml_writer/yaml_writer.dart';
 
 import 'models/harness_task.dart';
 import 'task_store.dart';
 
-/// [TaskStore] implementation that persists [HarnessTask] list to JSON files on disk.
+/// [TaskStore] implementation that persists [HarnessTask] list to YAML files on disk.
 final class FileTaskStore implements TaskStore {
   final String saveDir;
   final String filePath;
@@ -26,10 +27,16 @@ final class FileTaskStore implements TaskStore {
 
     final content = await _file.readAsString();
 
-    final list = jsonDecode(content) as List<dynamic>;
+    final dynamic parsed = loadYaml(content);
+
+    if (parsed == null) return [];
+
+    final list = parsed as YamlList;
 
     return list
-        .map((item) => _HarnessTask.fromJson(item as Map<String, dynamic>))
+        .map((item) => _HarnessTask.fromMap(
+              Map<String, dynamic>.from(item as YamlMap),
+            ))
         .toList();
   }
 
@@ -37,11 +44,11 @@ final class FileTaskStore implements TaskStore {
   Future<void> saveTasks(List<HarnessTask> tasks) async {
     await _createSaveDirIfNeeded(_file);
 
-    final jsonList = tasks.map((t) => _HarnessTask(t).toJson()).toList();
+    final dataList = tasks.map((t) => _HarnessTask(t).toMap()).toList();
 
-    final jsonString = const JsonEncoder.withIndent('  ').convert(jsonList);
+    final yamlString = YamlWriter(allowUnquotedStrings: true).write(dataList);
 
-    await _file.writeAsString(jsonString);
+    await _file.writeAsString(yamlString);
   }
 
   Future<void> _createSaveDirIfNeeded(File file) async {
@@ -53,7 +60,7 @@ final class FileTaskStore implements TaskStore {
   File get _file => File(p.join(saveDir, filePath));
 }
 
-/// Internal implementation of [HarnessTask] for JSON serialization.
+/// Internal implementation of [HarnessTask] for YAML serialization.
 final class _HarnessTask implements HarnessTask {
   _HarnessTask(HarnessTask task)
       : id = task.id,
@@ -68,12 +75,14 @@ final class _HarnessTask implements HarnessTask {
     required this.metadata,
   });
 
-  factory _HarnessTask.fromJson(Map<String, dynamic> json) {
+  factory _HarnessTask.fromMap(Map<String, dynamic> map) {
     return _HarnessTask.raw(
-      id: json['id'] as int? ?? 0,
-      title: json['title']?.toString() ?? '',
-      status: json['status']?.toString() ?? 'pending',
-      metadata: (json['metadata'] as Map<String, dynamic>?) ?? const {},
+      id: map['id'] as int? ?? 0,
+      title: map['title']?.toString() ?? '',
+      status: map['status']?.toString() ?? 'pending',
+      metadata: map['metadata'] != null
+          ? Map<String, dynamic>.from(map['metadata'] as Map)
+          : const {},
     );
   }
 
@@ -89,7 +98,7 @@ final class _HarnessTask implements HarnessTask {
   @override
   final Map<String, dynamic> metadata;
 
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toMap() => {
         'id': id,
         'title': title,
         'status': status,
