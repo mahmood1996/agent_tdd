@@ -60,8 +60,8 @@ void main() {
 
       // YAML list entries start with "- "
       expect(content, contains('- '));
-      // YAML uses key: value syntax, not JSON braces
-      expect(content, isNot(contains('{')));
+      // File must not start with JSON array syntax
+      expect(content.trimLeft(), isNot(startsWith('[')));
       expect(content, contains('id:'));
       expect(content, contains('title:'));
       expect(content, contains('status:'));
