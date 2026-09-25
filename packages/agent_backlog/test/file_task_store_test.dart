@@ -21,7 +21,7 @@ void main() {
     });
 
     test('tasks retrieves tasks saved by saveTasks', () async {
-      final store = FileTaskStore(tempDir.path, 'tasks.json');
+      final store = FileTaskStore(tempDir.path, 'tasks.yaml');
       final originalTasks = [
         const FakeHarnessTask(
           id: 1,
@@ -44,14 +44,37 @@ void main() {
       expect(retrievedTasks[1], equalsHarnessTask(originalTasks[1]));
     });
 
+    test('saveTasks writes valid YAML to disk', () async {
+      final store = FileTaskStore(tempDir.path, 'tasks.yaml');
+      await store.saveTasks([
+        const FakeHarnessTask(
+          id: 1,
+          title: 'Task 1',
+          status: 'pending',
+          metadata: {},
+        ),
+      ]);
+
+      final file = File('${tempDir.path}/tasks.yaml');
+      final content = await file.readAsString();
+
+      // YAML list entries start with "- "
+      expect(content, contains('- '));
+      // YAML uses key: value syntax, not JSON braces
+      expect(content, isNot(contains('{')));
+      expect(content, contains('id:'));
+      expect(content, contains('title:'));
+      expect(content, contains('status:'));
+    });
+
     test('tasks returns empty list if file does not exist', () async {
-      final store = FileTaskStore(tempDir.path, 'non_existent.json');
+      final store = FileTaskStore(tempDir.path, 'non_existent.yaml');
       final tasks = await store.tasks();
       expect(tasks, isEmpty);
     });
 
     test('FileTaskStore workflow with SmartTaskStore extension', () async {
-      final store = FileTaskStore(tempDir.path, 'tasks.json');
+      final store = FileTaskStore(tempDir.path, 'tasks.yaml');
       await store.saveTasks([
         const FakeHarnessTask(id: 1, title: 'Item 1', status: 'pending'),
         const FakeHarnessTask(id: 2, title: 'Item 2', status: 'pending'),
