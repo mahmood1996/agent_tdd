@@ -33,7 +33,7 @@ final class FileSnapshotStore implements SnapshotStore {
   Future<void> save(FileSnapshot snapshot) async {
     final file = File(_path);
     await file.parent.create(recursive: true);
-    await file.writeAsString(jsonEncode(snapshot.fingerprints));
+    await file.writeAsString(jsonEncode(FingerPrints(snapshot)));
   }
 
   @override

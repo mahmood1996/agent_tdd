@@ -23,18 +23,6 @@ void main() {
       });
     });
 
-    group('fingerprints extension getter', () {
-      test('returns full path → fingerprint map', () {
-        final map = {'file1.dart': 'hash1', 'file2.dart': 'hash2'};
-        final snapshot = FileSnapshot(map);
-        expect(snapshot.fingerprints, equals(map));
-      });
-
-      test('returns empty map for empty snapshot', () {
-        expect(FileSnapshot(const {}).fingerprints, isEmpty);
-      });
-    });
-
     group('diff extension', () {
       test('detects modified, added, and deleted files', () {
         final original = FileSnapshot({

@@ -1,7 +1,7 @@
 library agent_file_snapshot;
 
 // domain/models
-export 'src/domain/models/file_snapshot/file_snapshot.dart';
+export 'src/domain/models/file_snapshot/file_snapshot.dart' hide FingerPrints;
 export 'src/domain/models/file_snapshot_diff/file_snapshot_diff.dart';
 
 // data

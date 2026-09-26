@@ -9,7 +9,11 @@ abstract interface class FileSnapshotDiff {
   factory FileSnapshotDiff({
     required Map<String, String> originalHashes,
     required Map<String, String> currentHashes,
-  }) = _FileSnapshotDiffImpl;
+  }) =>
+      _FileSnapshotDiffImpl(
+        originalHashes: originalHashes,
+        currentHashes: currentHashes,
+      );
 }
 
 extension SmartFileSnapshotDiff on FileSnapshotDiff {

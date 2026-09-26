@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import '../file_snapshot_diff/file_snapshot_diff.dart';
 
 /// Abstract interface representing a point-in-time state of a set of files.
@@ -18,25 +20,15 @@ abstract interface class FileSnapshot {
 
 /// Helper extensions on [FileSnapshot].
 extension SmartFileSnapshot on FileSnapshot {
-  /// Returns the full path → fingerprint map for this snapshot.
-  ///
-  /// Symmetric pair with [filePaths] and [fingerprint]:
-  /// - [filePaths] — all paths
-  /// - [fingerprint] — one fingerprint by path
-  /// - [fingerprints] — all fingerprints as a map
-  Map<String, String> get fingerprints {
-    return {
-      for (final path in filePaths) path: fingerprint(path),
-    };
-  }
+  bool get hasFingerprints => FingerPrints(this).isNotEmpty;
 
   /// Computes the difference between this snapshot and [other].
   FileSnapshotDiff diff(
     FileSnapshot other,
   ) =>
       FileSnapshotDiff(
-        originalHashes: fingerprints,
-        currentHashes: other.fingerprints,
+        originalHashes: FingerPrints(this),
+        currentHashes: FingerPrints(other),
       );
 }
 
@@ -50,4 +42,16 @@ final class _FileSnapshotImpl implements FileSnapshot {
 
   @override
   String fingerprint(String filePath) => _fingerprints[filePath] ?? '';
+}
+
+final class FingerPrints extends UnmodifiableMapBase<String, String> {
+  FingerPrints(this._snapshot);
+
+  final FileSnapshot _snapshot;
+
+  @override
+  String? operator [](Object? key) => _snapshot.fingerprint(key.toString());
+
+  @override
+  Iterable<String> get keys => _snapshot.filePaths;
 }

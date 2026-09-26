@@ -44,7 +44,7 @@ final class IntegrityViolations
   @override
   Future<List<String>> call(String globPattern) async {
     final saved = await _snapshotStore.savedSnapshot();
-    if (saved.fingerprints.isEmpty) return const [];
+    if (!saved.hasFingerprints) return const [];
 
     final current = await _fileIndex.snapshotOf([globPattern]);
     return saved.diff(current).violations;
