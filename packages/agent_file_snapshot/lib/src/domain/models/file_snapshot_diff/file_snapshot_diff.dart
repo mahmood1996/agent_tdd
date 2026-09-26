@@ -1,3 +1,4 @@
+import 'package:agent_file_snapshot/src/domain/models/file_snapshot/file_snapshot.dart';
 import 'package:meta/meta.dart';
 
 /// Abstract interface representing differences between two file snapshots
@@ -7,13 +8,10 @@ abstract interface class FileSnapshotDiff {
   List<String> get modifiedFiles;
 
   factory FileSnapshotDiff({
-    required Map<String, String> originalHashes,
-    required Map<String, String> currentHashes,
+    required FileSnapshot original,
+    required FileSnapshot current,
   }) =>
-      _FileSnapshotDiffImpl(
-        originalHashes: originalHashes,
-        currentHashes: currentHashes,
-      );
+      _FileSnapshotDiffImpl(original: original, current: current);
 }
 
 extension SmartFileSnapshotDiff on FileSnapshotDiff {
@@ -25,26 +23,28 @@ extension SmartFileSnapshotDiff on FileSnapshotDiff {
 
 @immutable
 final class _FileSnapshotDiffImpl implements FileSnapshotDiff {
-  final Map<String, String> originalHashes;
-  final Map<String, String> currentHashes;
-
   const _FileSnapshotDiffImpl({
-    required this.originalHashes,
-    required this.currentHashes,
-  });
+    required FileSnapshot original,
+    required FileSnapshot current,
+  })  : _current = current,
+        _original = original;
+
+  final FileSnapshot _current;
+
+  final FileSnapshot _original;
 
   @override
-  List<String> get modifiedFiles => originalHashes.entries
+  List<String> get modifiedFiles => _original.filePaths
       .where((e) =>
-          currentHashes.containsKey(e.key) && currentHashes[e.key] != e.value)
-      .map((e) => e.key)
+          _current.containsFile(e) &&
+          _current.fingerprint(e) != _original.fingerprint(e))
       .toList();
 
   @override
   List<String> get deletedFiles =>
-      originalHashes.keys.where((k) => !currentHashes.containsKey(k)).toList();
+      _original.filePaths.where((e) => !_current.containsFile(e)).toList();
 
   @override
   List<String> get addedFiles =>
-      currentHashes.keys.where((k) => !originalHashes.containsKey(k)).toList();
+      _current.filePaths.where((e) => !_original.containsFile(e)).toList();
 }

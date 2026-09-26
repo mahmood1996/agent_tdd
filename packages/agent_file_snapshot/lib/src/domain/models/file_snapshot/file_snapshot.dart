@@ -20,16 +20,17 @@ abstract interface class FileSnapshot {
 
 /// Helper extensions on [FileSnapshot].
 extension SmartFileSnapshot on FileSnapshot {
+  /// Returns true if the snapshot is not empty.
   bool get hasFingerprints => FingerPrints(this).isNotEmpty;
+
+  /// Returns true if the snapshot contains the file.
+  bool containsFile(String filePath) => filePaths.contains(filePath);
 
   /// Computes the difference between this snapshot and [other].
   FileSnapshotDiff diff(
     FileSnapshot other,
   ) =>
-      FileSnapshotDiff(
-        originalHashes: FingerPrints(this),
-        currentHashes: FingerPrints(other),
-      );
+      FileSnapshotDiff(original: this, current: other);
 }
 
 final class _FileSnapshotImpl implements FileSnapshot {

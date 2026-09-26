@@ -3,7 +3,9 @@ import 'package:test/test.dart';
 
 void main() {
   group('FileSnapshotDiff Tests', () {
-    test('FileSnapshotDiff correctly evaluates added, deleted, and modified files', () {
+    test(
+        'FileSnapshotDiff correctly evaluates added, deleted, and modified files',
+        () {
       final originalHashes = {
         'kept.txt': 'hash1',
         'modified.txt': 'hash2_old',
@@ -16,8 +18,8 @@ void main() {
       };
 
       final diff = FileSnapshotDiff(
-        originalHashes: originalHashes,
-        currentHashes: currentHashes,
+        original: FileSnapshot(originalHashes),
+        current: FileSnapshot(currentHashes),
       );
 
       expect(diff.hasChanges, isTrue);
@@ -26,11 +28,13 @@ void main() {
       expect(diff.addedFiles, equals(['added.txt']));
     });
 
-    test('FileSnapshotDiff returns false for hasChanges when snapshots are identical', () {
+    test(
+        'FileSnapshotDiff returns false for hasChanges when snapshots are identical',
+        () {
       final hashes = {'file1.txt': 'hash1'};
       final diff = FileSnapshotDiff(
-        originalHashes: hashes,
-        currentHashes: Map.from(hashes),
+        original: FileSnapshot(hashes),
+        current: FileSnapshot(Map.from(hashes)),
       );
 
       expect(diff.hasChanges, isFalse);
