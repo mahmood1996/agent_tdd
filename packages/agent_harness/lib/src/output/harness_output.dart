@@ -1,61 +1,39 @@
 import 'dart:convert';
-import '../models/harness_state.dart';
 
 /// Abstract interface for terminal and machine-readable JSON stdout/stderr reporting
 abstract interface class HarnessOutput {
-  void info(String message);
-  void warning(String message);
-  void error(String message);
-
-  void reportSuccess({
-    required String message,
-    required HarnessState state,
-  });
-
-  void reportFailure({
-    required String error,
-    required HarnessState state,
-  });
+  void display(String message);
 }
 
-/// Standard console implementation emitting CLI text or structured JSON
+final class Message {
+  factory Message.info(String txt) => Message._(() => 'ℹ️ $txt');
+
+  factory Message.error(String txt) => Message._(() => '\x1B[31m❌ $txt\x1B[0m');
+
+  factory Message.success(String txt) =>
+      Message._(() => '\x1B[32m✅ $txt\x1B[0m');
+
+  factory Message.warning(String txt) =>
+      Message._(() => '\x1B[33m⚠️  $txt\x1B[0m');
+
+  factory Message.json(Map<String, dynamic> json) =>
+      Message._(() => jsonEncode(json));
+
+  const Message._(this._message);
+
+  final String Function() _message;
+
+  @override
+  String toString() => _message();
+}
+
 final class ConsoleOutput implements HarnessOutput {
-  final bool isJsonMode;
-  final void Function(String text)? printHandler;
-
   ConsoleOutput({
-    this.isJsonMode = false,
-    this.printHandler,
-  });
+    required void Function(String) printHandler,
+  }) : _printHandler = printHandler;
 
-  void _print(String text) => (printHandler ?? print).call(text);
-
-  @override
-  void info(String message) {
-    if (!isJsonMode) _print('ℹ️  $message');
-  }
+  final void Function(String text) _printHandler;
 
   @override
-  void warning(String message) {
-    if (!isJsonMode) _print('⚠️  $message');
-  }
-
-  @override
-  void error(String message) {
-    if (!isJsonMode) _print('❌ $message');
-  }
-
-  @override
-  void reportSuccess({required String message, required HarnessState state}) {
-    isJsonMode
-        ? _print(jsonEncode(state.toSuccessJson(message)))
-        : info('[${state.phase}] $message');
-  }
-
-  @override
-  void reportFailure({required String error, required HarnessState state}) {
-    isJsonMode
-        ? _print(jsonEncode(state.toFailureJson(error)))
-        : this.error('[${state.phase}] $error');
-  }
+  void display(String message) => _printHandler(message);
 }

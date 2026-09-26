@@ -1,5 +1,8 @@
-import '../../../core/data/snapshot_store.dart';
+import 'package:agent_file_snapshot/agent_file_snapshot.dart';
+import 'package:path/path.dart' as p;
+
 import '../../../core/data/tdd_cycle.dart';
+import '../../../core/domain/tdd_constants.dart';
 
 final class ResetCycleResult {
   final bool success;
@@ -16,7 +19,10 @@ final class ResetCycleUseCase {
     required this.projectDir,
     SnapshotStore? snapshotStore,
     TddCycle? tddCycle,
-  })  : snapshotStore = snapshotStore ?? SnapshotStore(projectDir: projectDir),
+  })  : snapshotStore = snapshotStore ??
+            FileSnapshotStore(
+              path: p.join(projectDir, TddConstants.snapshotFileName),
+            ),
         tddCycle = tddCycle ?? TddCycle(projectDir: projectDir);
 
   Future<ResetCycleResult> execute() async {

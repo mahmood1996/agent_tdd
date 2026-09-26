@@ -24,12 +24,17 @@ extension SmartFileSnapshot on FileSnapshot {
   /// - [filePaths] — all paths
   /// - [fingerprint] — one fingerprint by path
   /// - [fingerprints] — all fingerprints as a map
-  Map<String, String> get fingerprints => {
-        for (final path in filePaths) path: fingerprint(path),
-      };
+  Map<String, String> get fingerprints {
+    return {
+      for (final path in filePaths) path: fingerprint(path),
+    };
+  }
 
   /// Computes the difference between this snapshot and [other].
-  FileSnapshotDiff diff(FileSnapshot other) => FileSnapshotDiff(
+  FileSnapshotDiff diff(
+    FileSnapshot other,
+  ) =>
+      FileSnapshotDiff(
         originalHashes: fingerprints,
         currentHashes: other.fingerprints,
       );

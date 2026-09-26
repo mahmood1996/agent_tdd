@@ -1,11 +1,11 @@
 // Package exports
 export 'package:agent_harness/agent_harness.dart';
-export 'package:agent_file_snapshot/agent_file_snapshot.dart';
 export 'package:agent_backlog/agent_backlog.dart';
 
 // Core exports
 export 'src/core/domain/spec_item.dart';
 export 'src/core/domain/tdd_config.dart';
+export 'src/core/domain/tdd_constants.dart';
 export 'src/core/domain/tdd_state.dart';
 export 'src/core/domain/executable_process_result.dart';
 export 'src/core/domain/analysis_issue.dart';
@@ -13,7 +13,6 @@ export 'src/core/domain/analysis_issue.dart';
 export 'src/core/data/spec_store.dart';
 export 'src/core/data/config_store.dart';
 export 'src/core/data/tdd_cycle.dart';
-export 'src/core/data/snapshot_store.dart';
 
 export 'src/core/services/processes.dart';
 export 'src/core/services/test_run_verifications.dart';

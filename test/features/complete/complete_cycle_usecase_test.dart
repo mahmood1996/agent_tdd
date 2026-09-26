@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:agent_file_snapshot/agent_file_snapshot.dart';
 import 'package:agent_tdd/agent_tdd.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
@@ -27,10 +28,13 @@ void main() {
       final res = await useCase.execute();
 
       expect(res.success, isFalse);
-      expect(res.message, contains('complete can only be run after verifying REFACTOR phase'));
+      expect(res.message,
+          contains('complete can only be run after verifying REFACTOR phase'));
     });
 
-    test('execute completes active spec, deletes snapshot, resets cycle to IDLE, and commits git', () async {
+    test(
+        'execute completes active spec, deletes snapshot, resets cycle to IDLE, and commits git',
+        () async {
       final specStore = SpecStore(projectDir: harness.tempDir.path);
       await specStore.addSpec('Spec 1');
       await specStore.updateSpecStatus(1, 'refactor');
@@ -44,11 +48,16 @@ void main() {
         lastUpdated: DateTime.now(),
       ));
 
-      final snapshotStore = SnapshotStore(projectDir: harness.tempDir.path);
-      final snapshot = await snapshotStore.capture('test/**/*.dart');
-      await snapshotStore.save(snapshot);
+      final captureSnapshot = CaptureSnapshot(
+        fileIndex: DiskFileIndex(baseDir: harness.tempDir.path),
+        snapshotStore: FileSnapshotStore(
+          path: p.join(harness.tempDir.path, TddConstants.snapshotFileName),
+        ),
+      );
+      await captureSnapshot('test/**/*.dart');
 
-      final snapshotFile = File(p.join(harness.tempDir.path, SnapshotStore.snapshotFileName));
+      final snapshotFile =
+          File(p.join(harness.tempDir.path, TddConstants.snapshotFileName));
       expect(snapshotFile.existsSync(), isTrue);
 
       final mockGit = MockGitClient(projectDir: harness.tempDir.path);
@@ -74,7 +83,8 @@ void main() {
       expect(allSpecs.first.status, equals('done'));
     });
 
-    test('execute completes active spec when phase is TddPhase.alreadyPassed', () async {
+    test('execute completes active spec when phase is TddPhase.alreadyPassed',
+        () async {
       final specStore = SpecStore(projectDir: harness.tempDir.path);
       await specStore.addSpec('Spec 1');
       await specStore.updateSpecStatus(1, 'already_passed');
@@ -100,7 +110,8 @@ void main() {
       expect(res.success, isTrue);
       expect(res.completedSpecId, equals(1));
       expect(res.currentState.phase, equals(TddPhase.idle));
-      expect(mockGit.lastCommitMessage, contains('🎉 DONE (spec-1): Spec 1 (already satisfied)'));
+      expect(mockGit.lastCommitMessage,
+          contains('🎉 DONE (spec-1): Spec 1 (already satisfied)'));
 
       final allSpecs = await specStore.specs();
       expect(allSpecs.first.status, equals('done'));

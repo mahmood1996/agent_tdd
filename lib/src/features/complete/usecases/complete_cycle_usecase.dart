@@ -1,7 +1,10 @@
+import 'package:agent_file_snapshot/agent_file_snapshot.dart';
+import 'package:path/path.dart' as p;
+
 import '../../../core/data/config_store.dart';
-import '../../../core/data/snapshot_store.dart';
 import '../../../core/data/spec_store.dart';
 import '../../../core/data/tdd_cycle.dart';
+import '../../../core/domain/tdd_constants.dart';
 import '../../../core/domain/tdd_state.dart';
 import '../../../core/services/git_client.dart';
 
@@ -41,7 +44,10 @@ final class CompleteCycleUseCase {
   })  : configStore = configStore ?? ConfigStore(projectDir: projectDir),
         specStore = specStore ?? SpecStore(projectDir: projectDir),
         tddCycle = tddCycle ?? TddCycle(projectDir: projectDir),
-        snapshotStore = snapshotStore ?? SnapshotStore(projectDir: projectDir),
+        snapshotStore = snapshotStore ??
+            FileSnapshotStore(
+              path: p.join(projectDir, TddConstants.snapshotFileName),
+            ),
         gitClient = gitClient ?? GitClient(projectDir: projectDir);
 
   Future<CompleteCycleResult> execute() async {
@@ -95,5 +101,3 @@ final class CompleteCycleUseCase {
     );
   }
 }
-
-

@@ -5,7 +5,7 @@ import 'package:glob/glob.dart';
 import 'package:glob/list_local_fs.dart';
 import 'package:path/path.dart' as p;
 
-import '../file_snapshot/file_snapshot.dart';
+import '../../domain/models/file_snapshot/file_snapshot.dart';
 import 'file_index.dart';
 
 /// Concrete [FileIndex] that traverses the file system and computes

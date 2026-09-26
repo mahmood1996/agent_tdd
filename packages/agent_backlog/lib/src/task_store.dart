@@ -24,4 +24,12 @@ extension SmartTaskStore on TaskStore {
             .map((t) => t.id == taskId ? t.copyWith(status: 'done') : t)
             .toList(),
       );
+
+  /// Updates the status of a specific task by ID and persists the change
+  Future<void> updateTaskStatus(int taskId, String status) async =>
+      await saveTasks(
+        (await tasks())
+            .map((t) => t.id == taskId ? t.copyWith(status: status) : t)
+            .toList(),
+      );
 }

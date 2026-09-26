@@ -1,179 +1,119 @@
-import 'dart:async';
 import 'dart:convert';
 import 'package:agent_harness/agent_harness.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('ConsoleOutput Behavioral Tests', () {
-    group('Text Mode (isJsonMode: false)', () {
-      test('info prints message with info icon prefix', () {
-        final outputs = <String>[];
-        final output =
-            ConsoleOutput(isJsonMode: false, printHandler: outputs.add);
+  group('ConsoleOutput', () {
+    late List<String> outputs;
+    late ConsoleOutput console;
 
-        output.info('System status nominal');
-
-        expect(outputs, equals(['ℹ️  System status nominal']));
-      });
-
-      test('warning prints message with warning icon prefix', () {
-        final outputs = <String>[];
-        final output =
-            ConsoleOutput(isJsonMode: false, printHandler: outputs.add);
-
-        output.warning('Deprecation notice');
-
-        expect(outputs, equals(['⚠️  Deprecation notice']));
-      });
-
-      test('error prints message with error icon prefix', () {
-        final outputs = <String>[];
-        final output =
-            ConsoleOutput(isJsonMode: false, printHandler: outputs.add);
-
-        output.error('Compilation failed');
-
-        expect(outputs, equals(['❌ Compilation failed']));
-      });
-
-      test('reportSuccess formats success message with phase prefix', () {
-        final outputs = <String>[];
-        final output =
-            ConsoleOutput(isJsonMode: false, printHandler: outputs.add);
-        const state = FakeHarnessState(
-          phase: 'GREEN',
-          editablePatterns: ['lib/**/*.dart'],
-          readOnlyPatterns: ['test/**/*.dart'],
-        );
-
-        output.reportSuccess(message: 'All tests passed', state: state);
-
-        expect(outputs, equals(['ℹ️  [GREEN] All tests passed']));
-      });
-
-      test('reportFailure formats error message with phase prefix', () {
-        final outputs = <String>[];
-        final output =
-            ConsoleOutput(isJsonMode: false, printHandler: outputs.add);
-        const state = FakeHarnessState(
-          phase: 'RED',
-          editablePatterns: ['test/**/*.dart'],
-          readOnlyPatterns: ['lib/**/*.dart'],
-        );
-
-        output.reportFailure(error: 'Assertion failed', state: state);
-
-        expect(outputs, equals(['❌ [RED] Assertion failed']));
-      });
+    setUp(() {
+      outputs = [];
+      console = ConsoleOutput(printHandler: outputs.add);
     });
 
-    group('JSON Mode (isJsonMode: true)', () {
-      test('info, warning, and error emit no output', () {
-        final outputs = <String>[];
-        final output =
-            ConsoleOutput(isJsonMode: true, printHandler: outputs.add);
+    test('display forwards the raw string to the printHandler', () {
+      console.display('hello world');
 
-        output.info('Info message');
-        output.warning('Warning message');
-        output.error('Error message');
-
-        expect(outputs, isEmpty);
-      });
-
-      test('reportSuccess outputs serialized JSON response', () {
-        final outputs = <String>[];
-        final output =
-            ConsoleOutput(isJsonMode: true, printHandler: outputs.add);
-        const state = FakeHarnessState(
-          phase: 'GREEN',
-          editablePatterns: ['lib/**/*.dart'],
-          readOnlyPatterns: ['test/**/*.dart'],
-          nextCommand: 'agent-tdd complete',
-        );
-
-        output.reportSuccess(message: 'Phase transition allowed', state: state);
-
-        expect(outputs.length, equals(1));
-        final decoded = jsonDecode(outputs.first) as Map<String, dynamic>;
-        expect(decoded['success'], isTrue);
-        expect(decoded['message'], equals('Phase transition allowed'));
-        expect(decoded['phase'], equals('GREEN'));
-        expect(decoded['instructions_for_agent'],
-            equals('Phase transition allowed'));
-        expect(decoded['allowed_actions'], {
-          'editable_files': ['lib/**/*.dart'],
-          'read_only_files': ['test/**/*.dart'],
-          'next_command': 'agent-tdd complete',
-        });
-      });
-
-      test('reportFailure outputs serialized JSON error response', () {
-        final outputs = <String>[];
-        final output =
-            ConsoleOutput(isJsonMode: true, printHandler: outputs.add);
-        const state = FakeHarnessState(
-          phase: 'RED',
-          editablePatterns: ['test/**/*.dart'],
-          readOnlyPatterns: ['lib/**/*.dart'],
-        );
-
-        output.reportFailure(error: 'Test suite failed', state: state);
-
-        expect(outputs.length, equals(1));
-        final decoded = jsonDecode(outputs.first) as Map<String, dynamic>;
-        expect(decoded['success'], isFalse);
-        expect(decoded['error'], equals('Test suite failed'));
-        expect(decoded['phase'], equals('RED'));
-        expect(decoded['instructions_for_agent'],
-            equals('Fix error: Test suite failed'));
-        expect(decoded['allowed_actions'], {
-          'editable_files': ['test/**/*.dart'],
-          'read_only_files': ['lib/**/*.dart'],
-        });
-      });
+      expect(outputs, equals(['hello world']));
     });
 
-    test('defaults to standard print when printHandler is omitted', () {
-      final printedLines = <String>[];
-      final output = ConsoleOutput(isJsonMode: false);
+    test('display can be called multiple times independently', () {
+      console.display('first');
+      console.display('second');
 
-      runZoned(
-        () {
-          output.info('Default print message');
-        },
-        zoneSpecification: ZoneSpecification(
-          print: (self, parent, zone, line) {
-            printedLines.add(line);
-          },
-        ),
+      expect(outputs, equals(['first', 'second']));
+    });
+  });
+
+  group('Message factories', () {
+    test('Message.info produces info-prefixed string', () {
+      expect(Message.info('System nominal').toString(),
+          equals('ℹ️ System nominal'));
+    });
+
+    test('Message.warning produces ANSI yellow warning string', () {
+      expect(
+        Message.warning('Deprecation notice').toString(),
+        equals('\x1B[33m⚠️  Deprecation notice\x1B[0m'),
       );
+    });
 
-      expect(printedLines, equals(['ℹ️  Default print message']));
+    test('Message.error produces ANSI red error string', () {
+      expect(
+        Message.error('Compilation failed').toString(),
+        equals('\x1B[31m❌ Compilation failed\x1B[0m'),
+      );
+    });
+
+    test('Message.success produces ANSI green success string', () {
+      expect(
+        Message.success('All tests passed').toString(),
+        equals('\x1B[32m✅ All tests passed\x1B[0m'),
+      );
+    });
+
+    test('Message.json serializes a Map to JSON string', () {
+      final msg = Message.json({'status': 'ok', 'count': 3});
+      final decoded = jsonDecode(msg.toString()) as Map<String, dynamic>;
+
+      expect(decoded['status'], equals('ok'));
+      expect(decoded['count'], equals(3));
+    });
+
+    test('Message.json round-trips nested structures', () {
+      final payload = {
+        'phase': 'GREEN',
+        'allowed_actions': {
+          'editable_files': ['lib/**/*.dart'],
+        },
+      };
+      final msg = Message.json(payload);
+      final decoded = Map<String, dynamic>.from(jsonDecode(msg.toString()));
+
+      expect(decoded['phase'], equals('GREEN'));
+      expect(
+        decoded['allowed_actions']['editable_files'],
+        equals(['lib/**/*.dart']),
+      );
     });
   });
-}
 
-final class FakeHarnessState implements HarnessState {
-  const FakeHarnessState({
-    required this.phase,
-    required this.editablePatterns,
-    required this.readOnlyPatterns,
-    this.nextCommand,
-    this.extra = const {},
+  group('ConsoleOutput + Message integration', () {
+    late List<String> outputs;
+    late ConsoleOutput console;
+
+    setUp(() {
+      outputs = [];
+      console = ConsoleOutput(printHandler: outputs.add);
+    });
+
+    test('displays info message via Message.info', () {
+      console.display(Message.info('Starting phase').toString());
+
+      expect(outputs, equals(['ℹ️ Starting phase']));
+    });
+
+    test('displays error message with ANSI codes via Message.error', () {
+      console.display(Message.error('Test failed').toString());
+
+      expect(outputs, equals(['\x1B[31m❌ Test failed\x1B[0m']));
+    });
+
+    test('displays success message with ANSI codes via Message.success', () {
+      console.display(Message.success('Phase complete').toString());
+
+      expect(outputs, equals(['\x1B[32m✅ Phase complete\x1B[0m']));
+    });
+
+    test('displays structured JSON payload via Message.json', () {
+      console.display(
+          Message.json({'success': true, 'phase': 'GREEN'}).toString());
+
+      expect(outputs.length, equals(1));
+      final decoded = Map<String, dynamic>.from(jsonDecode(outputs.first));
+      expect(decoded['success'], isTrue);
+      expect(decoded['phase'], equals('GREEN'));
+    });
   });
-
-  @override
-  final String phase;
-
-  @override
-  final String? nextCommand;
-
-  @override
-  final Map<String, dynamic> extra;
-
-  @override
-  final List<String> editablePatterns;
-
-  @override
-  final List<String> readOnlyPatterns;
 }

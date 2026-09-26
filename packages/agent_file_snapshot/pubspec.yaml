@@ -2,6 +2,7 @@ name: agent_file_snapshot
 description: Cryptographic file snapshot, integrity verification, and diff engine for AI Agent harnesses.
 version: 1.0.0
 sdk: ">=3.0.0 <4.0.0"
+publish_to: none
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -9,7 +10,10 @@ environment:
 dependencies:
   crypto: ^3.0.3
   glob: ^2.1.2
+  meta: ^1.9.0
   path: ^1.9.0
+  usecase:
+    path: ../usecase
 
 dev_dependencies:
   test: ^1.24.0

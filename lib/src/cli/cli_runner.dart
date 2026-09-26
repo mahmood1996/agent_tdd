@@ -1,5 +1,4 @@
 import '../core/data/config_store.dart';
-import '../core/data/snapshot_store.dart';
 import '../core/data/spec_store.dart';
 import '../core/data/tdd_cycle.dart';
 import '../core/services/analyzer.dart';
@@ -20,7 +19,6 @@ final class CliRunner {
   final ConfigStore configStore;
   final SpecStore specStore;
   final TddCycle tddCycle;
-  final SnapshotStore snapshotStore;
   final TestRunVerifications testRunVerifications;
   final Analyzer analyzer;
   final GitClient gitClient;
@@ -36,7 +34,6 @@ final class CliRunner {
     ConfigStore? configStore,
     SpecStore? specStore,
     TddCycle? tddCycle,
-    SnapshotStore? snapshotStore,
     TestRunVerifications? testRunVerifications,
     Analyzer? analyzer,
     GitClient? gitClient,
@@ -48,7 +45,6 @@ final class CliRunner {
   })  : configStore = configStore ?? ConfigStore(projectDir: projectDir),
         specStore = specStore ?? SpecStore(projectDir: projectDir),
         tddCycle = tddCycle ?? TddCycle(projectDir: projectDir),
-        snapshotStore = snapshotStore ?? SnapshotStore(projectDir: projectDir),
         testRunVerifications = testRunVerifications ??
             TestRunVerifications(projectDir, configStore: configStore),
         analyzer = analyzer ??
@@ -72,7 +68,6 @@ final class CliRunner {
           configStore: configStore ?? ConfigStore(projectDir: projectDir),
           specStore: specStore ?? SpecStore(projectDir: projectDir),
           tddCycle: tddCycle ?? TddCycle(projectDir: projectDir),
-          snapshotStore: snapshotStore ?? SnapshotStore(projectDir: projectDir),
           testRunVerifications: testRunVerifications ??
               TestRunVerifications(projectDir, configStore: configStore),
           analyzer: analyzer ??
@@ -85,7 +80,6 @@ final class CliRunner {
           configStore: configStore ?? ConfigStore(projectDir: projectDir),
           specStore: specStore ?? SpecStore(projectDir: projectDir),
           tddCycle: tddCycle ?? TddCycle(projectDir: projectDir),
-          snapshotStore: snapshotStore ?? SnapshotStore(projectDir: projectDir),
           gitClient: gitClient ?? GitClient(projectDir: projectDir),
           presenter: lifecyclePresenter,
         );

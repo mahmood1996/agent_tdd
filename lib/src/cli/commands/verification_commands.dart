@@ -1,5 +1,4 @@
 import '../../core/data/config_store.dart';
-import '../../core/data/snapshot_store.dart';
 import '../../core/data/spec_store.dart';
 import '../../core/data/tdd_cycle.dart';
 import '../../core/domain/tdd_state.dart';
@@ -17,7 +16,6 @@ final class VerificationCommands {
   final ConfigStore configStore;
   final SpecStore specStore;
   final TddCycle tddCycle;
-  final SnapshotStore snapshotStore;
   final TestRunVerifications testRunVerifications;
   final Analyzer analyzer;
   final GitClient gitClient;
@@ -28,7 +26,6 @@ final class VerificationCommands {
     required this.configStore,
     required this.specStore,
     required this.tddCycle,
-    required this.snapshotStore,
     required this.testRunVerifications,
     required this.analyzer,
     required this.gitClient,
@@ -41,7 +38,6 @@ final class VerificationCommands {
       configStore: configStore,
       specStore: specStore,
       tddCycle: tddCycle,
-      snapshotStore: snapshotStore,
       testRunVerifications: testRunVerifications,
       gitClient: gitClient,
     );
@@ -60,7 +56,6 @@ final class VerificationCommands {
         configStore: configStore,
         specStore: specStore,
         tddCycle: tddCycle,
-        snapshotStore: snapshotStore,
         gitClient: gitClient,
       );
       final completeRes = await completeUseCase.execute();
@@ -77,7 +72,6 @@ final class VerificationCommands {
       configStore: configStore,
       specStore: specStore,
       tddCycle: tddCycle,
-      snapshotStore: snapshotStore,
       testRunVerifications: testRunVerifications,
       gitClient: gitClient,
     );

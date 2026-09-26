@@ -25,18 +25,12 @@ final class FileTaskStore implements TaskStore {
   Future<List<HarnessTask>> _tryGettingSavedTasks() async {
     if (!await _file.exists()) return [];
 
-    final content = await _file.readAsString();
-
-    final dynamic parsed = loadYaml(content);
-
-    if (parsed == null) return [];
-
-    final list = parsed as YamlList;
-
-    return list
-        .map((item) => _HarnessTask.fromMap(
-              Map<String, dynamic>.from(item as YamlMap),
-            ))
+    return List.from(loadYaml(await _file.readAsString()) ?? const [])
+        .map(
+          (item) => _HarnessTask.fromMap(
+            Map<String, dynamic>.from(item),
+          ),
+        )
         .toList();
   }
 

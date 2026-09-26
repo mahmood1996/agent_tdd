@@ -19,6 +19,8 @@ dependencies:
     path: packages/agent_file_snapshot
   agent_backlog:
     path: packages/agent_backlog
+  usecase: 
+    path: packages/usecase
 
 dev_dependencies:
   test: ^1.25.0

@@ -1,4 +1,4 @@
-import '../file_snapshot/file_snapshot.dart';
+import '../../domain/models/file_snapshot/file_snapshot.dart';
 
 /// Abstract interface for producing a [FileSnapshot] from file glob patterns.
 ///

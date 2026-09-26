@@ -1,8 +1,12 @@
+import 'package:agent_file_snapshot/agent_file_snapshot.dart';
+import 'package:path/path.dart' as p;
+import 'package:usecase/usecase.dart';
+
 import '../../../core/data/config_store.dart';
-import '../../../core/data/snapshot_store.dart';
 import '../../../core/data/spec_store.dart';
 import '../../../core/data/tdd_cycle.dart';
 import '../../../core/domain/tdd_config.dart';
+import '../../../core/domain/tdd_constants.dart';
 import '../../../core/domain/tdd_state.dart';
 import '../../../core/services/git_client.dart';
 import '../../../core/services/test_run_verifications.dart';
@@ -26,8 +30,8 @@ final class VerifyRedUseCase {
   final ConfigStore configStore;
   final SpecStore specStore;
   final TddCycle tddCycle;
-  final SnapshotStore snapshotStore;
   final TestRunVerifications testRunVerifications;
+  final ParameterizedUsecase<void, String> captureSnapshot;
   final GitClient gitClient;
 
   VerifyRedUseCase({
@@ -35,13 +39,19 @@ final class VerifyRedUseCase {
     ConfigStore? configStore,
     SpecStore? specStore,
     TddCycle? tddCycle,
-    SnapshotStore? snapshotStore,
     TestRunVerifications? testRunVerifications,
+    ParameterizedUsecase<void, String>? captureSnapshot,
     GitClient? gitClient,
   })  : configStore = configStore ?? ConfigStore(projectDir: projectDir),
         specStore = specStore ?? SpecStore(projectDir: projectDir),
         tddCycle = tddCycle ?? TddCycle(projectDir: projectDir),
-        snapshotStore = snapshotStore ?? SnapshotStore(projectDir: projectDir),
+        captureSnapshot = captureSnapshot ??
+            CaptureSnapshot(
+              fileIndex: DiskFileIndex(baseDir: projectDir),
+              snapshotStore: FileSnapshotStore(
+                path: p.join(projectDir, TddConstants.snapshotFileName),
+              ),
+            ),
         testRunVerifications =
             testRunVerifications ?? TestRunVerifications(projectDir),
         gitClient = gitClient ?? GitClient(projectDir: projectDir);
@@ -93,8 +103,7 @@ final class VerifyRedUseCase {
       );
     }
 
-    final snapshot = await snapshotStore.capture(config.testFiles);
-    await snapshotStore.save(snapshot);
+    await captureSnapshot(config.testFiles);
 
     final newState = state.copyWith(
       phase: TddPhase.green,
