@@ -1,8 +1,4 @@
-/// Support for doing something awesome.
-///
-/// More dartdocs go here.
-library;
-
-export 'src/config_base.dart';
-
-// TODO: Export any libraries intended for clients of this package.
+export 'src/domain/models/readable_config.dart';
+export 'src/domain/models/serializable_config.dart';
+export 'src/domain/models/config.dart';
+export 'src/domain/stores/config_store.dart';

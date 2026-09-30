@@ -2,7 +2,7 @@
 specs:
   - id: 1
     title: "Implement domain models and store interface (Config, ReadableConfig, SerializableConfig, ConfigStore)"
-    status: green
+    status: refactor
   - id: 2
     title: "Implement JsonConfig model with lazy evaluation and fallback valueBy"
     status: pending
