@@ -8,4 +8,4 @@ specs:
     status: done
   - id: 3
     title: "Implement FileConfigStore with YAML reading and writing"
-    status: refactor
+    status: done

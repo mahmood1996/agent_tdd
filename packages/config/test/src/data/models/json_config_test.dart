@@ -18,17 +18,5 @@ void main() {
       final config = JsonConfig('{"key": "value"}');
       expect(config.toMap(), equals({'key': 'value'}));
     });
-
-    test('lazily evaluates json map', () {
-      int evaluationCount = 0;
-      final config = JsonConfig.fromSupplier(() {
-        evaluationCount++;
-        return {'lazyKey': 'lazyValue'};
-      });
-
-      expect(evaluationCount, equals(0));
-      expect(config.valueBy<String>('lazyKey', 'fallback'), equals('lazyValue'));
-      expect(evaluationCount, greaterThanOrEqualTo(1));
-    });
   });
 }

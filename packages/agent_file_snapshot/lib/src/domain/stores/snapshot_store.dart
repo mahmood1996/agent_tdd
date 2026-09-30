@@ -1,4 +1,4 @@
-import '../../domain/models/file_snapshot/file_snapshot.dart';
+import '../models/file_snapshot/file_snapshot.dart';
 
 /// Abstract interface for persisting and retrieving a [FileSnapshot].
 ///

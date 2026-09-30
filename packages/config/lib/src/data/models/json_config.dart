@@ -4,36 +4,20 @@ import '../../domain/models/config.dart';
 
 /// A default [Config] implementation using [LazyMap] to lazily parse or evaluate configuration maps.
 final class JsonConfig implements Config {
-  late final LazyMap<String, dynamic, dynamic> _map;
-
   /// Creates a [JsonConfig] by wrapping a raw JSON string into a [LazyMap].
-  JsonConfig(String jsonString) {
-    _map = LazyMap<String, dynamic, dynamic>(
-      src: () => jsonDecode(jsonString) as Map<String, dynamic>,
-    );
-  }
+  JsonConfig(String jsonString)
+    : _map = LazyMap<String, dynamic, dynamic>(
+        src: () => jsonDecode(jsonString) as Map<String, dynamic>,
+      );
 
-  /// Creates a [JsonConfig] from a custom map supplier.
-  JsonConfig.fromSupplier(Map<String, dynamic> Function() supplier) {
-    _map = LazyMap<String, dynamic, dynamic>(src: supplier);
-  }
-
-  /// Creates a [JsonConfig] from an existing Map.
-  JsonConfig.fromMap(Map<String, dynamic> map) {
-    _map = LazyMap<String, dynamic, dynamic>(src: () => map);
-  }
+  final Map<String, dynamic> _map;
 
   @override
-  V valueBy<V>(String key, V fallback) {
-    final val = _map[key];
-    if (val is V) {
-      return val;
-    }
-    return fallback;
-  }
+  V valueBy<V>(String key, V fallback) => switch (_map[key]) {
+    final value when value is V => value,
+    _ => fallback,
+  };
 
   @override
-  Map<String, dynamic> toMap() {
-    return Map<String, dynamic>.unmodifiable(_map);
-  }
+  Map<String, dynamic> toMap() => Map<String, dynamic>.unmodifiable(_map);
 }

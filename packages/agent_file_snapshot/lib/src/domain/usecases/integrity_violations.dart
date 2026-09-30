@@ -1,7 +1,7 @@
 import 'package:usecase/usecase.dart';
 
-import '../../data/file_index/file_index.dart';
-import '../../data/snapshot_store/snapshot_store.dart';
+import '../services/file_index.dart';
+import '../stores/snapshot_store.dart';
 import '../models/file_snapshot/file_snapshot.dart';
 import '../models/file_snapshot_diff/file_snapshot_diff.dart';
 

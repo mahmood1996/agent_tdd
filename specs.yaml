@@ -1,8 +1,0 @@
-# agent-tdd Feature Specs Backlog
-specs:
-  - id: 1
-    title: "Implement JsonConfig model with lazy evaluation and fallback valueBy"
-    status: already_passed
-  - id: 2
-    title: "Implement FileConfigStore with YAML reading and writing"
-    status: pending

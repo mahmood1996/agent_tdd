@@ -6,7 +6,7 @@ import 'package:glob/list_local_fs.dart';
 import 'package:path/path.dart' as p;
 
 import '../../domain/models/file_snapshot/file_snapshot.dart';
-import 'file_index.dart';
+import '../../domain/services/file_index.dart';
 
 /// Concrete [FileIndex] that traverses the file system and computes
 /// SHA-256 fingerprints for all files matching the given glob patterns.

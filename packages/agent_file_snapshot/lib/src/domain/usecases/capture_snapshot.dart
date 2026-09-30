@@ -1,7 +1,7 @@
 import 'package:usecase/usecase.dart';
 
-import '../../data/file_index/file_index.dart';
-import '../../data/snapshot_store/snapshot_store.dart';
+import '../services/file_index.dart';
+import '../stores/snapshot_store.dart';
 
 /// A [ParameterizedUsecase] that captures a snapshot of files matching
 /// [globPattern] via [FileIndex] and persists it through [SnapshotStore].

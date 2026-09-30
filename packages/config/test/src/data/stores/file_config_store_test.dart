@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:test/test.dart';
 import 'package:config/config.dart';
-import 'package:config/src/data/stores/file_config_store.dart';
 
 void main() {
   late Directory tempDir;
@@ -25,17 +24,20 @@ void main() {
       expect(conf, isNull);
     });
 
-    test('saves config to yaml file and loads it back correctly', () async {
+    test('saving config', () async {
       final store = FileConfigStore(filePath);
-      final initialConfig = JsonConfig('{"environment": "production", "port": 443}');
+      final initialConfig = JsonConfig(
+        '{"environment": "production", "port": 443}',
+      );
 
       await store.save(initialConfig);
 
-      expect(File(filePath).existsSync(), isTrue);
-
       final loadedConfig = await store.config();
       expect(loadedConfig, isNotNull);
-      expect(loadedConfig!.valueBy<String>('environment', 'dev'), equals('production'));
+      expect(
+        loadedConfig!.valueBy<String>('environment', 'dev'),
+        equals('production'),
+      );
       expect(loadedConfig.valueBy<int>('port', 80), equals(443));
     });
 

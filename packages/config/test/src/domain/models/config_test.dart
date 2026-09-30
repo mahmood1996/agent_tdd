@@ -1,8 +1,5 @@
 import 'package:test/test.dart';
-import 'package:config/src/domain/models/readable_config.dart';
-import 'package:config/src/domain/models/serializable_config.dart';
-import 'package:config/src/domain/models/config.dart';
-import 'package:config/src/domain/stores/config_store.dart';
+import 'package:config/config.dart';
 
 class TestConfig implements Config {
   @override
