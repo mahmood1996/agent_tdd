@@ -1,0 +1,11 @@
+# agent-tdd Feature Specs Backlog
+specs:
+  - id: 1
+    title: "Implement domain models and store interface (Config, ReadableConfig, SerializableConfig, ConfigStore)"
+    status: green
+  - id: 2
+    title: "Implement JsonConfig model with lazy evaluation and fallback valueBy"
+    status: pending
+  - id: 3
+    title: "Implement FileConfigStore with YAML reading and writing"
+    status: pending
