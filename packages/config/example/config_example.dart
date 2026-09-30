@@ -1,6 +1,14 @@
 import 'package:config/config.dart';
 
+class SampleConfig implements Config {
+  @override
+  V valueBy<V>(String key, V fallback) => fallback;
+
+  @override
+  Map<String, dynamic> toMap() => {};
+}
+
 void main() {
-  var awesome = Awesome();
-  print('awesome: ${awesome.isAwesome}');
+  final config = SampleConfig();
+  print(config.valueBy('key', 'default'));
 }
