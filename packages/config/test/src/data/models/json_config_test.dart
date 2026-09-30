@@ -1,6 +1,5 @@
 import 'package:test/test.dart';
 import 'package:config/config.dart';
-import 'package:config/src/data/models/json_config.dart';
 
 void main() {
   group('JsonConfig', () {
