@@ -5,7 +5,7 @@ specs:
     status: done
   - id: 2
     title: "Implement JsonConfig model with lazy evaluation and fallback valueBy"
-    status: green
+    status: refactor
   - id: 3
     title: "Implement FileConfigStore with YAML reading and writing"
     status: pending
