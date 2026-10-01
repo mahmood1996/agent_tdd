@@ -31,7 +31,7 @@ final class CompleteCycleUseCase {
   final ConfigStore configStore;
   final SpecStore specStore;
   final TddCycle tddCycle;
-  final SnapshotStore snapshotStore;
+  final DeleteSnapshot deleteSnapshot;
   final GitClient gitClient;
 
   CompleteCycleUseCase({
@@ -39,16 +39,16 @@ final class CompleteCycleUseCase {
     ConfigStore? configStore,
     SpecStore? specStore,
     TddCycle? tddCycle,
-    SnapshotStore? snapshotStore,
     GitClient? gitClient,
+    DeleteSnapshot? deleteSnapshot,
   })  : configStore = configStore ?? ConfigStore(projectDir: projectDir),
         specStore = specStore ?? SpecStore(projectDir: projectDir),
         tddCycle = tddCycle ?? TddCycle(projectDir: projectDir),
-        snapshotStore = snapshotStore ??
-            FileSnapshotStore(
-              path: p.join(projectDir, TddConstants.snapshotFileName),
-            ),
-        gitClient = gitClient ?? GitClient(projectDir: projectDir);
+        gitClient = gitClient ?? GitClient(projectDir: projectDir),
+        deleteSnapshot = deleteSnapshot ??
+            DeleteSnapshot(
+                snapshotPath:
+                    p.join(projectDir, TddConstants.snapshotFileName));
 
   Future<CompleteCycleResult> execute() async {
     final state = await tddCycle.savedTddState();
@@ -81,7 +81,7 @@ final class CompleteCycleUseCase {
       await specStore.updateSpecStatus(activeId, 'done');
     }
 
-    await snapshotStore.delete();
+    await deleteSnapshot();
     await tddCycle.reset();
 
     final summary = await specStore.summary();

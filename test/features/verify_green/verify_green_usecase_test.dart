@@ -66,10 +66,9 @@ void main() {
           harness.createFile('test/unit/sample_test.dart', 'void main() {}');
 
       final captureSnapshot = CaptureSnapshot(
-        fileIndex: DiskFileIndex(baseDir: harness.tempDir.path),
-        snapshotStore: FileSnapshotStore(
-          path: p.join(harness.tempDir.path, TddConstants.snapshotFileName),
-        ),
+        baseDir: harness.tempDir.path,
+        snapshotPath:
+            p.join(harness.tempDir.path, TddConstants.snapshotFileName),
       );
       await captureSnapshot('test/**/*_test.dart');
 
@@ -98,10 +97,9 @@ void main() {
       harness.createFile('test/sample_test.dart', 'void main() {}');
 
       final captureSnapshot = CaptureSnapshot(
-        fileIndex: DiskFileIndex(baseDir: harness.tempDir.path),
-        snapshotStore: FileSnapshotStore(
-          path: p.join(harness.tempDir.path, TddConstants.snapshotFileName),
-        ),
+        baseDir: harness.tempDir.path,
+        snapshotPath:
+            p.join(harness.tempDir.path, TddConstants.snapshotFileName),
       );
       await captureSnapshot('test/**/*.dart');
 
@@ -146,10 +144,9 @@ void main() {
       harness.createFile('test/sample_test.dart', 'void main() {}');
 
       final captureSnapshot = CaptureSnapshot(
-        fileIndex: DiskFileIndex(baseDir: harness.tempDir.path),
-        snapshotStore: FileSnapshotStore(
-          path: p.join(harness.tempDir.path, TddConstants.snapshotFileName),
-        ),
+        baseDir: harness.tempDir.path,
+        snapshotPath:
+            p.join(harness.tempDir.path, TddConstants.snapshotFileName),
       );
       await captureSnapshot('test/**/*.dart');
 

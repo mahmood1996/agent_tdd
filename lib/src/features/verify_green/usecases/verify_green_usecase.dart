@@ -1,6 +1,5 @@
 import 'package:agent_file_snapshot/agent_file_snapshot.dart';
 import 'package:path/path.dart' as p;
-import 'package:usecase/usecase.dart';
 
 import '../../../core/data/config_store.dart';
 import '../../../core/data/spec_store.dart';
@@ -34,7 +33,7 @@ final class VerifyGreenUseCase {
   final TddCycle tddCycle;
   final GitClient gitClient;
   final TestRunVerifications testRunVerifications;
-  final ParameterizedUsecase<List<String>, String> integrityViolations;
+  final IntegrityViolations integrityViolations;
 
   VerifyGreenUseCase({
     required this.projectDir,
@@ -42,17 +41,15 @@ final class VerifyGreenUseCase {
     SpecStore? specStore,
     TddCycle? tddCycle,
     TestRunVerifications? testRunVerifications,
-    ParameterizedUsecase<List<String>, String>? integrityViolations,
+    IntegrityViolations? integrityViolations,
     GitClient? gitClient,
   })  : configStore = configStore ?? ConfigStore(projectDir: projectDir),
         specStore = specStore ?? SpecStore(projectDir: projectDir),
         tddCycle = tddCycle ?? TddCycle(projectDir: projectDir),
         integrityViolations = integrityViolations ??
             IntegrityViolations(
-              fileIndex: DiskFileIndex(baseDir: projectDir),
-              snapshotStore: FileSnapshotStore(
-                path: p.join(projectDir, TddConstants.snapshotFileName),
-              ),
+              baseDir: projectDir,
+              snapshotPath: p.join(projectDir, TddConstants.snapshotFileName),
             ),
         testRunVerifications = testRunVerifications ??
             TestRunVerifications(projectDir, configStore: configStore),

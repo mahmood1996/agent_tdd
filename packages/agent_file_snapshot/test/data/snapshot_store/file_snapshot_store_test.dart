@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:agent_file_snapshot/agent_file_snapshot.dart';
+import 'package:agent_file_snapshot/src/adapters/out/file_snapshot_store.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 

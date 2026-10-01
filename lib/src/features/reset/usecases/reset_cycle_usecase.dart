@@ -11,22 +11,22 @@ final class ResetCycleResult {
 }
 
 final class ResetCycleUseCase {
-  final String projectDir;
-  final SnapshotStore snapshotStore;
-  final TddCycle tddCycle;
-
   ResetCycleUseCase({
-    required this.projectDir,
-    SnapshotStore? snapshotStore,
+    required String projectDir,
+    DeleteSnapshot? deleteSnapshot,
     TddCycle? tddCycle,
-  })  : snapshotStore = snapshotStore ??
-            FileSnapshotStore(
-              path: p.join(projectDir, TddConstants.snapshotFileName),
+  })  : deleteSnapshot = deleteSnapshot ??
+            DeleteSnapshot(
+              snapshotPath: p.join(projectDir, TddConstants.snapshotFileName),
             ),
         tddCycle = tddCycle ?? TddCycle(projectDir: projectDir);
 
+  final TddCycle tddCycle;
+
+  final DeleteSnapshot deleteSnapshot;
+
   Future<ResetCycleResult> execute() async {
-    await snapshotStore.delete();
+    await deleteSnapshot();
     await tddCycle.reset();
     return const ResetCycleResult(success: true);
   }

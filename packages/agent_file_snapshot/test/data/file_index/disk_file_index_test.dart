@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:agent_file_snapshot/agent_file_snapshot.dart';
+import 'package:agent_file_snapshot/src/adapters/out/disk_file_index.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 
@@ -9,8 +9,7 @@ void main() {
     late Directory tempDir;
 
     setUp(() async {
-      tempDir =
-          await Directory.systemTemp.createTemp('disk_file_index_test_');
+      tempDir = await Directory.systemTemp.createTemp('disk_file_index_test_');
     });
 
     tearDown(() async {
@@ -62,8 +61,7 @@ void main() {
     test('does not include files that do not match the pattern', () async {
       await File(p.join(tempDir.path, 'sample.dart'))
           .writeAsString('void main() {}');
-      await File(p.join(tempDir.path, 'readme.txt'))
-          .writeAsString('readme');
+      await File(p.join(tempDir.path, 'readme.txt')).writeAsString('readme');
 
       final index = DiskFileIndex(baseDir: tempDir.path);
       final snapshot = await index.snapshotOf(['*.dart']);

@@ -1,7 +1,7 @@
 import 'package:usecase/usecase.dart';
 
-import '../services/file_index.dart';
-import '../stores/snapshot_store.dart';
+import '../../ports/out/file_index.dart';
+import '../../ports/out/snapshot_store.dart';
 
 /// A [ParameterizedUsecase] that captures a snapshot of files matching
 /// [globPattern] via [FileIndex] and persists it through [SnapshotStore].
@@ -14,8 +14,9 @@ import '../stores/snapshot_store.dart';
 /// );
 /// await capture('test/**/*_test.dart');
 /// ```
-final class CaptureSnapshot implements ParameterizedUsecase<void, String> {
-  const CaptureSnapshot({
+final class CaptureSnapshotService
+    implements ParameterizedUsecase<void, String> {
+  const CaptureSnapshotService({
     required FileIndex fileIndex,
     required SnapshotStore snapshotStore,
   })  : _fileIndex = fileIndex,

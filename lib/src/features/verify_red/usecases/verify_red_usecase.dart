@@ -1,6 +1,5 @@
 import 'package:agent_file_snapshot/agent_file_snapshot.dart';
 import 'package:path/path.dart' as p;
-import 'package:usecase/usecase.dart';
 
 import '../../../core/data/config_store.dart';
 import '../../../core/data/spec_store.dart';
@@ -26,31 +25,28 @@ final class VerifyRedResult {
 }
 
 final class VerifyRedUseCase {
-  final String projectDir;
   final ConfigStore configStore;
   final SpecStore specStore;
   final TddCycle tddCycle;
   final TestRunVerifications testRunVerifications;
-  final ParameterizedUsecase<void, String> captureSnapshot;
+  final CaptureSnapshot captureSnapshot;
   final GitClient gitClient;
 
   VerifyRedUseCase({
-    required this.projectDir,
+    required String projectDir,
     ConfigStore? configStore,
     SpecStore? specStore,
     TddCycle? tddCycle,
     TestRunVerifications? testRunVerifications,
-    ParameterizedUsecase<void, String>? captureSnapshot,
+    CaptureSnapshot? captureSnapshot,
     GitClient? gitClient,
   })  : configStore = configStore ?? ConfigStore(projectDir: projectDir),
         specStore = specStore ?? SpecStore(projectDir: projectDir),
         tddCycle = tddCycle ?? TddCycle(projectDir: projectDir),
         captureSnapshot = captureSnapshot ??
             CaptureSnapshot(
-              fileIndex: DiskFileIndex(baseDir: projectDir),
-              snapshotStore: FileSnapshotStore(
-                path: p.join(projectDir, TddConstants.snapshotFileName),
-              ),
+              baseDir: projectDir,
+              snapshotPath: p.join(projectDir, TddConstants.snapshotFileName),
             ),
         testRunVerifications =
             testRunVerifications ?? TestRunVerifications(projectDir),

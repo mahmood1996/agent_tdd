@@ -1,6 +1,6 @@
 import 'dart:collection';
 
-import '../file_snapshot_diff/file_snapshot_diff.dart';
+import 'file_snapshot_diff.dart';
 
 /// Abstract interface representing a point-in-time state of a set of files.
 ///

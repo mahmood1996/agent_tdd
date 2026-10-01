@@ -1,5 +1,6 @@
-import 'package:agent_file_snapshot/src/domain/models/file_snapshot/file_snapshot.dart';
 import 'package:meta/meta.dart';
+
+import 'file_snapshot.dart';
 
 /// Abstract interface representing differences between two file snapshots
 abstract interface class FileSnapshotDiff {

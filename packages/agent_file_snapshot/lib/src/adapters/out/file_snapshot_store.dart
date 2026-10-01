@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
-import '../../domain/models/file_snapshot/file_snapshot.dart';
-import '../../domain/stores/snapshot_store.dart';
+import '../../application/domain/models/file_snapshot.dart';
+import '../../application/ports/out/snapshot_store.dart';
 
 /// Concrete [SnapshotStore] that persists a [FileSnapshot] as a JSON file
 /// on the local file system.

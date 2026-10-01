@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:yaml/yaml.dart';
 import 'package:yaml_writer/yaml_writer.dart';
-import '../../domain/models/config.dart';
+
+import '../../domain/models/readable_config.dart';
 import '../../domain/models/serializable_config.dart';
 import '../../domain/stores/config_store.dart';
 import '../models/json_config.dart';
@@ -18,7 +19,7 @@ final class FileConfigStore implements ConfigStore {
   final File _file;
 
   @override
-  Future<Config?> config() async {
+  Future<ReadableConfig?> config() async {
     return !await _file.exists()
         ? null
         : switch ((await _file.readAsString()).trim()) {

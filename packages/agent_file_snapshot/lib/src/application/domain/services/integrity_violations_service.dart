@@ -1,9 +1,10 @@
 import 'package:usecase/usecase.dart';
 
-import '../services/file_index.dart';
-import '../stores/snapshot_store.dart';
-import '../models/file_snapshot/file_snapshot.dart';
-import '../models/file_snapshot_diff/file_snapshot_diff.dart';
+import '../../ports/out/file_index.dart';
+import '../../ports/out/snapshot_store.dart';
+
+import '../models/file_snapshot.dart';
+import '../models/file_snapshot_diff.dart';
 
 /// A [ParameterizedUsecase] that returns the list of integrity violations
 /// between the previously saved [FileSnapshot] and the current state of files
@@ -24,9 +25,9 @@ import '../models/file_snapshot_diff/file_snapshot_diff.dart';
 /// );
 /// final violations = await check('test/**/*_test.dart');
 /// ```
-final class IntegrityViolations
+final class IntegrityViolationsService
     implements ParameterizedUsecase<List<String>, String> {
-  const IntegrityViolations({
+  const IntegrityViolationsService({
     required FileIndex fileIndex,
     required SnapshotStore snapshotStore,
   })  : _fileIndex = fileIndex,
