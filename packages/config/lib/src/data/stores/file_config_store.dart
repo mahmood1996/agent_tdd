@@ -19,14 +19,14 @@ final class FileConfigStore implements ConfigStore {
   final File _file;
 
   @override
-  Future<ReadableConfig?> config() async {
+  Future<ReadableConfig> config() async {
     return !await _file.exists()
-        ? null
+        ? ReadableConfig.empty
         : switch ((await _file.readAsString()).trim()) {
-            '' => null,
+            '' => ReadableConfig.empty,
             final content => switch (loadYaml(content)) {
               final Map result => JsonConfig(jsonEncode(result)),
-              _ => null,
+              _ => ReadableConfig.empty,
             },
           };
   }

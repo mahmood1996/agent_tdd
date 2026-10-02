@@ -29,10 +29,8 @@ final class InitHarnessUseCase {
         specStore = specStore ?? SpecStore(projectDir: projectDir);
 
   Future<InitHarnessResult> execute({String? runnerPreset}) async {
-    final config =
-        runnerPreset != null && TddConfig.presets.containsKey(runnerPreset)
-            ? TddConfig.presets[runnerPreset]!
-            : await configStore.config();
+    final config = TddConfig.presets[runnerPreset] ??
+        await TddConfig.detectedOn(projectDir);
 
     await configStore.save(config);
 
@@ -51,5 +49,3 @@ final class InitHarnessUseCase {
     );
   }
 }
-
-

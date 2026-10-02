@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:cactoos_dart/cactoos_dart.dart';
-import '../../domain/models/config.dart';
+import '../../domain/models/readable_config.dart';
 
-/// A default [Config] implementation using [LazyMap] to lazily parse or evaluate configuration maps.
-final class JsonConfig implements Config {
+/// A [ReadableConfig] implementation using [LazyMap] to lazily parse JSON into configuration values.
+final class JsonConfig implements ReadableConfig {
   /// Creates a [JsonConfig] by wrapping a raw JSON string into a [LazyMap].
   JsonConfig(String jsonString)
     : _map = LazyMap<String, dynamic, dynamic>(
@@ -18,6 +18,4 @@ final class JsonConfig implements Config {
     _ => fallback,
   };
 
-  @override
-  Map<String, dynamic> toMap() => Map<String, dynamic>.unmodifiable(_map);
 }

@@ -14,42 +14,7 @@ final class ConfigStore {
 
     return (await configFile.exists())
         ? await _savedConfigFrom(configFile.path)
-        : await _detectedConfig();
-  }
-
-  Future<TddConfig> _detectedConfig() async {
-    final pubspecFile = File(p.join(_projectDir, 'pubspec.yaml'));
-    if (await pubspecFile.exists()) {
-      final content = await pubspecFile.readAsString();
-      if (content.contains('sdk: flutter') || content.contains('flutter:')) {
-        return TddConfig.presets['flutter']!;
-      }
-      return TddConfig.presets['dart']!;
-    }
-
-    if (await File(p.join(_projectDir, 'Cargo.toml')).exists()) {
-      return TddConfig.presets['cargo']!;
-    }
-    if (await File(p.join(_projectDir, 'go.mod')).exists()) {
-      return TddConfig.presets['go']!;
-    }
-
-    final pkgJsonFile = File(p.join(_projectDir, 'package.json'));
-    if (await pkgJsonFile.exists()) {
-      final content = await pkgJsonFile.readAsString();
-      if (content.contains('vitest')) {
-        return TddConfig.presets['vitest']!;
-      }
-      return TddConfig.presets['jest']!;
-    }
-
-    if (await File(p.join(_projectDir, 'pytest.ini')).exists() ||
-        await File(p.join(_projectDir, 'requirements.txt')).exists() ||
-        await File(p.join(_projectDir, 'pyproject.toml')).exists()) {
-      return TddConfig.presets['pytest']!;
-    }
-
-    return TddConfig.presets['dart']!;
+        : await TddConfig.detectedOn(_projectDir);
   }
 
   Future<TddConfig> _savedConfigFrom(String filePath) async {

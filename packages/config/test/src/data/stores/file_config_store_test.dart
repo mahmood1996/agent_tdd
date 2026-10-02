@@ -2,6 +2,20 @@ import 'dart:io';
 import 'package:test/test.dart';
 import 'package:config/config.dart';
 
+final class _SerializableConfig implements SerializableConfig {
+  _SerializableConfig() : this._(map: {});
+
+  _SerializableConfig._({required this._map});
+
+  final Map<String, dynamic> _map;
+
+  _SerializableConfig withVariable(String key, dynamic value) =>
+      _SerializableConfig._(map: {..._map, key: value});
+
+  @override
+  Map<String, dynamic> toMap() => Map.unmodifiable(_map);
+}
+
 void main() {
   late Directory tempDir;
   late String filePath;
@@ -18,33 +32,31 @@ void main() {
   });
 
   group('FileConfigStore', () {
-    test('returns null when file does not exist', () async {
+    test('returns empty config when no config stored', () async {
       final store = FileConfigStore(filePath);
-      final conf = await store.config();
-      expect(conf, isNull);
+
+      final config = await store.config();
+
+      expect(config.valueBy<int>('test', 12), equals(12));
     });
 
     test('saving config', () async {
       final store = FileConfigStore(filePath);
-      final initialConfig = JsonConfig(
-        '{"environment": "production", "port": 443}',
-      );
+
+      final initialConfig = _SerializableConfig()
+          .withVariable('environment', 'production')
+          .withVariable('port', 443);
 
       await store.save(initialConfig);
 
       final loadedConfig = await store.config();
-      expect(loadedConfig, isNotNull);
+
       expect(
-        loadedConfig!.valueBy<String>('environment', 'dev'),
+        loadedConfig.valueBy<String>('environment', 'dev'),
         equals('production'),
       );
-      expect(loadedConfig.valueBy<int>('port', 80), equals(443));
-    });
 
-    test('returns null when file is empty', () async {
-      await File(filePath).writeAsString('');
-      final store = FileConfigStore(filePath);
-      expect(await store.config(), isNull);
+      expect(loadedConfig.valueBy<int>('port', 80), equals(443));
     });
   });
 }

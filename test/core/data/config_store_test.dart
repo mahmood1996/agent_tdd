@@ -28,7 +28,8 @@ void main() {
       expect(config.testCommand, equals('flutter test'));
     });
 
-    test('config returns auto-detected config when .tddrc.yaml is absent', () async {
+    test('config returns auto-detected config when .tddrc.yaml is absent',
+        () async {
       harness.createFile('pubspec.yaml', 'name: my_dart_app\n');
       final store = ConfigStore(projectDir: harness.tempDir.path);
       final config = await store.config();
@@ -37,7 +38,8 @@ void main() {
       expect(config.testCommand, equals('dart test'));
     });
 
-    test('config loads configuration from file when .tddrc.yaml exists', () async {
+    test('config loads configuration from file when .tddrc.yaml exists',
+        () async {
       final store = ConfigStore(projectDir: harness.tempDir.path);
       final customConfig = TddConfig.presets['pytest']!;
       await store.save(customConfig);

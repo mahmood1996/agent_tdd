@@ -3,8 +3,9 @@ import '../models/serializable_config.dart';
 
 /// Abstract storage boundary for loading and persisting configuration instances.
 abstract interface class ConfigStore {
-  /// Loads the stored configuration, or returns `null` if none exists.
-  Future<ReadableConfig?> config();
+  /// Loads the stored configuration.
+  /// Returns [ReadableConfig.empty] if none exists.
+  Future<ReadableConfig> config();
 
   /// Persists a [SerializableConfig] instance.
   Future<void> save(SerializableConfig conf);

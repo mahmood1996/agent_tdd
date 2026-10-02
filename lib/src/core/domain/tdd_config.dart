@@ -1,11 +1,42 @@
+import 'dart:io';
+import 'package:path/path.dart' as p;
+
 final class TddConfig {
-  final String runner;
-  final String testCommand;
-  final String? analyzeCommand;
-  final String testFiles;
-  final String sourceFiles;
-  final bool failOnWarnings;
-  final bool gitCommit;
+  static Future<TddConfig> detectedOn(String projectDir) async {
+    final pubspecFile = File(p.join(projectDir, 'pubspec.yaml'));
+    if (await pubspecFile.exists()) {
+      final content = await pubspecFile.readAsString();
+
+      return (content.contains('sdk: flutter') || content.contains('flutter:'))
+          ? TddConfig.presets['flutter']!
+          : TddConfig.presets['dart']!;
+    }
+
+    if (await File(p.join(projectDir, 'Cargo.toml')).exists()) {
+      return TddConfig.presets['cargo']!;
+    }
+
+    if (await File(p.join(projectDir, 'go.mod')).exists()) {
+      return TddConfig.presets['go']!;
+    }
+
+    final pkgJsonFile = File(p.join(projectDir, 'package.json'));
+    if (await pkgJsonFile.exists()) {
+      final content = await pkgJsonFile.readAsString();
+
+      return content.contains('vitest')
+          ? TddConfig.presets['vitest']!
+          : TddConfig.presets['jest']!;
+    }
+
+    if (await File(p.join(projectDir, 'pytest.ini')).exists() ||
+        await File(p.join(projectDir, 'requirements.txt')).exists() ||
+        await File(p.join(projectDir, 'pyproject.toml')).exists()) {
+      return TddConfig.presets['pytest']!;
+    }
+
+    return TddConfig.presets['dart']!;
+  }
 
   const TddConfig({
     required this.runner,
@@ -16,6 +47,14 @@ final class TddConfig {
     this.failOnWarnings = true,
     this.gitCommit = true,
   });
+
+  final String runner;
+  final String testCommand;
+  final String? analyzeCommand;
+  final String testFiles;
+  final String sourceFiles;
+  final bool failOnWarnings;
+  final bool gitCommit;
 
   TddConfig copyWith({
     String? runner,
