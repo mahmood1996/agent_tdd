@@ -12,9 +12,12 @@ class GitClient {
 
   Future<bool> isGitRepo() async {
     ExecutableProcessResult? res;
-    await processes.process('git rev-parse --is-inside-work-tree').execute(
+    await processes
+        .process(
+          'git rev-parse --is-inside-work-tree',
           onFinished: (result) => res = result,
-        );
+        )
+        .execute();
     return res != null && res!.isSuccess && res!.stdout.trim() == 'true';
   }
 
@@ -25,9 +28,12 @@ class GitClient {
 
     final escapedMsg = message.replaceAll('"', '\\"');
     ExecutableProcessResult? res;
-    await processes.process('git commit -m "$escapedMsg"').execute(
+    await processes
+        .process(
+          'git commit -m "$escapedMsg"',
           onFinished: (result) => res = result,
-        );
+        )
+        .execute();
     return res != null && res!.isSuccess;
   }
 }

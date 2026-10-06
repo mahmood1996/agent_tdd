@@ -12,11 +12,12 @@ void main() {
       final processes = Processes(harness.tempDir.path);
       ExecutableProcessResult? res;
 
-      await processes.process('echo "hello world"').execute(
+      await processes.process(
+        'echo "hello world"',
         onFinished: (result) {
           res = result;
         },
-      );
+      ).execute();
 
       expect(res, isNotNull);
       expect(res!.exitCode, equals(0));
@@ -29,11 +30,12 @@ void main() {
       final processes = Processes(harness.tempDir.path);
       ExecutableProcessResult? res;
 
-      await processes.process('exit 1').execute(
+      await processes.process(
+        'exit 1',
         onFinished: (result) {
           res = result;
         },
-      );
+      ).execute();
 
       expect(res, isNotNull);
       expect(res!.exitCode, equals(1));

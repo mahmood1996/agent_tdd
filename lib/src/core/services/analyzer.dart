@@ -32,7 +32,9 @@ class Analyzer {
 
     ExecutableProcessResult? res;
 
-    await processes.process(cmd).execute(onFinished: (result) => res = result);
+    await processes
+        .process(cmd, onFinished: (result) => res = result)
+        .execute();
 
     final result = res!;
     final issues = _issuesIn(result.combinedOutput);

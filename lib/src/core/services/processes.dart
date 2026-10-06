@@ -7,19 +7,30 @@ final class Processes {
 
   const Processes([this.workingDirectory = '.']);
 
-  ExecutableProcess process(String command) =>
-      ExecutableProcess(command, workingDirectory: workingDirectory);
+  ExecutableProcess process(
+    String command, {
+    void Function(ExecutableProcessResult result)? onFinished,
+  }) =>
+      ExecutableProcess(
+        command,
+        onFinished: onFinished,
+        workingDirectory: workingDirectory,
+      );
 }
 
 final class ExecutableProcess {
   final String command;
   final String workingDirectory;
 
-  const ExecutableProcess(this.command, {required this.workingDirectory});
+  final void Function(ExecutableProcessResult result)? onFinished;
 
-  Future<void> execute({
-    void Function(ExecutableProcessResult result)? onFinished,
-  }) async {
+  const ExecutableProcess(
+    this.command, {
+    required this.workingDirectory,
+    this.onFinished,
+  });
+
+  Future<void> execute() async {
     final sw = Stopwatch()..start();
 
     final res = Platform.isWindows

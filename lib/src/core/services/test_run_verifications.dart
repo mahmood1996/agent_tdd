@@ -35,8 +35,8 @@ class TestRunVerifications {
     ExecutableProcessResult? result;
 
     await processes
-        .process(config.testCommand)
-        .execute(onFinished: (res) => result = res);
+        .process(config.testCommand, onFinished: (res) => result = res)
+        .execute();
 
     onFinished(_redVerification(result!));
   }
@@ -48,8 +48,8 @@ class TestRunVerifications {
     ExecutableProcessResult? result;
 
     await processes
-        .process(config.testCommand)
-        .execute(onFinished: (res) => result = res);
+        .process(config.testCommand, onFinished: (res) => result = res)
+        .execute();
 
     onFinished(_greenVerification(result!));
   }
@@ -61,8 +61,8 @@ class TestRunVerifications {
     ExecutableProcessResult? result;
 
     await processes
-        .process(config.testCommand)
-        .execute(onFinished: (res) => result = res);
+        .process(config.testCommand, onFinished: (res) => result = res)
+        .execute();
 
     onFinished(_refactorVerification(result!));
   }

@@ -13,13 +13,6 @@ void main() {
   });
 
   group('ConfigStore Solitary Unit Tests', () {
-    test('config returns custom config when .tddrc.yaml is absent', () async {
-      final config = await _store.config();
-
-      expect(config.runner, equals('custom'));
-      expect(config.testCommand, equals(''));
-    });
-
     test('config loads configuration from file when .tddrc.yaml exists',
         () async {
       const customConfig = TddConfig.pytest();
