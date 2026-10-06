@@ -46,6 +46,10 @@ void main() {
   final harness = BaseTest()..setUpBase('verify_red_usecase_test_');
 
   group('VerifyRedUseCase Behavioral Solitary Unit Tests', () {
+    setUp(() async {
+      await ConfigStore(projectDir: harness.tempDir.path)
+          .save(const TddConfig.dart());
+    });
     test('execute fails when executed outside RED phase (e.g. IDLE)', () async {
       final useCase = VerifyRedUseCase(projectDir: harness.tempDir.path);
       final res = await useCase.execute();

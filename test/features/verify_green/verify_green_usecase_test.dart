@@ -48,6 +48,10 @@ void main() {
   final harness = BaseTest()..setUpBase('verify_green_usecase_test_');
 
   group('VerifyGreenUseCase Behavioral Solitary Unit Tests', () {
+    setUp(() async {
+      await ConfigStore(projectDir: harness.tempDir.path)
+          .save(const TddConfig.dart());
+    });
     test('execute fails when executed outside GREEN phase', () async {
       final useCase = VerifyGreenUseCase(projectDir: harness.tempDir.path);
       final res = await useCase.execute();

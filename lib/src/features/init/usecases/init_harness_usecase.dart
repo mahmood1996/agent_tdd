@@ -19,19 +19,25 @@ final class InitHarnessResult {
 
 final class InitHarnessUseCase {
   final String projectDir;
-  final ConfigStore configStore;
+
   final SpecStore specStore;
+
+  final ConfigStore configStore;
+
+  final ConfigDetection configDetection;
 
   InitHarnessUseCase({
     required this.projectDir,
     SpecStore? specStore,
     ConfigStore? configStore,
+    ConfigDetection? configDetection,
   })  : configStore = configStore ?? ConfigStore(projectDir: projectDir),
-        specStore = specStore ?? SpecStore(projectDir: projectDir);
+        specStore = specStore ?? SpecStore(projectDir: projectDir),
+        configDetection = configDetection ?? ConfigDetection();
 
   Future<InitHarnessResult> execute({String? runnerPreset}) async {
-    final config = TddConfig.presets[runnerPreset] ??
-        (await ConfigDetection().detectConfig(projectDir))!;
+    final config = TddConfig.fromPreset(runnerPreset ?? '') ??
+        await configDetection.detectedConfig(projectDir);
 
     await configStore.save(config);
 
