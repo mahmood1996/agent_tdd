@@ -5,13 +5,13 @@ abstract interface class TddConfig {
     String preset,
   ) =>
       switch (preset) {
-        'dart' => const TddConfig.dart(),
-        'flutter' => const TddConfig.flutter(),
-        'vitest' => const TddConfig.vitest(),
-        'jest' => const TddConfig.jest(),
-        'pytest' => const TddConfig.pytest(),
         'go' => const TddConfig.go(),
+        'dart' => const TddConfig.dart(),
+        'jest' => const TddConfig.jest(),
         'cargo' => const TddConfig.cargo(),
+        'pytest' => const TddConfig.pytest(),
+        'vitest' => const TddConfig.vitest(),
+        'flutter' => const TddConfig.flutter(),
         _ => null,
       };
 
@@ -46,72 +46,102 @@ abstract interface class TddConfig {
 
 final class _TddConfigImpl implements TddConfig {
   const _TddConfigImpl.dart()
-      : runner = 'dart',
-        testCommand = 'dart test',
-        analyzeCommand = 'dart analyze',
-        testFiles = 'test/**/*_test.dart',
-        sourceFiles = 'lib/**/*.dart';
+      : this._(
+          const {
+            'runner': 'dart',
+            'testCommand': 'dart test',
+            'analyzeCommand': 'dart analyze',
+            'testFiles': 'test/**/*_test.dart',
+            'sourceFiles': 'lib/**/*.dart',
+          },
+        );
 
   const _TddConfigImpl.flutter()
-      : runner = 'flutter',
-        testCommand = 'flutter test',
-        analyzeCommand = 'flutter analyze',
-        testFiles = 'test/**/*_test.dart',
-        sourceFiles = 'lib/**/*.dart';
+      : this._(
+          const {
+            'runner': 'flutter',
+            'testCommand': 'flutter test',
+            'analyzeCommand': 'flutter analyze',
+            'testFiles': 'test/**/*_test.dart',
+            'sourceFiles': 'lib/**/*.dart',
+          },
+        );
 
   const _TddConfigImpl.vitest()
-      : runner = 'vitest',
-        testCommand = 'npx vitest run',
-        analyzeCommand = 'npx eslint . --max-warnings 0',
-        testFiles = 'src/**/*.test.ts',
-        sourceFiles = 'src/**/*.ts';
+      : this._(
+          const {
+            'runner': 'vitest',
+            'testCommand': 'npx vitest run',
+            'analyzeCommand': 'npx eslint . --max-warnings 0',
+            'testFiles': 'src/**/*.test.ts',
+            'sourceFiles': 'src/**/*.ts',
+          },
+        );
 
   const _TddConfigImpl.jest()
-      : runner = 'jest',
-        testCommand = 'npx jest',
-        analyzeCommand = 'npx eslint . --max-warnings 0',
-        testFiles = 'src/**/*.test.js',
-        sourceFiles = 'src/**/*.js';
+      : this._(
+          const {
+            'runner': 'jest',
+            'testCommand': 'npx jest',
+            'analyzeCommand': 'npx eslint . --max-warnings 0',
+            'testFiles': 'src/**/*.test.js',
+            'sourceFiles': 'src/**/*.js',
+          },
+        );
 
   const _TddConfigImpl.pytest()
-      : runner = 'pytest',
-        testCommand = 'pytest',
-        analyzeCommand = 'flake8',
-        testFiles = 'tests/**/test_*.py',
-        sourceFiles = 'src/**/*.py';
+      : this._(const {
+          'runner': 'pytest',
+          'testCommand': 'pytest',
+          'analyzeCommand': 'flake8',
+          'testFiles': 'tests/**/test_*.py',
+          'sourceFiles': 'src/**/*.py',
+        });
 
   const _TddConfigImpl.go()
-      : runner = 'go',
-        testCommand = 'go test ./...',
-        analyzeCommand = 'go vet ./...',
-        testFiles = '**/*_test.go',
-        sourceFiles = '**/*.go';
+      : this._(
+          const {
+            'runner': 'go',
+            'testCommand': 'go test ./...',
+            'analyzeCommand': 'go vet ./...',
+            'testFiles': '**/*_test.go',
+            'sourceFiles': '**/*.go',
+          },
+        );
 
   const _TddConfigImpl.cargo()
-      : runner = 'cargo',
-        testCommand = 'cargo test',
-        analyzeCommand = 'cargo check',
-        testFiles = 'tests/**/*.rs',
-        sourceFiles = 'src/**/*.rs';
+      : this._(
+          const {
+            'runner': 'cargo',
+            'testCommand': 'cargo test',
+            'analyzeCommand': 'cargo check',
+            'testFiles': 'tests/**/*.rs',
+            'sourceFiles': 'src/**/*.rs',
+          },
+        );
+
+  const _TddConfigImpl._(this._props);
+
+  final Map<String, dynamic> _props;
 
   @override
-  final String runner;
+  String get runner => _props['runner'];
 
   @override
-  final String testCommand;
+  String get testCommand => _props['testCommand'] ?? '';
 
   @override
-  final String? analyzeCommand;
+  String? get analyzeCommand => _props['analyzeCommand'];
 
   @override
-  final String testFiles;
+  String get testFiles => _props['testFiles'] ?? '';
 
   @override
-  final String sourceFiles;
+  String get sourceFiles => _props['sourceFiles'] ?? '';
 
   @override
-  bool get gitCommit => true;
+  bool get gitCommit => _props['gitCommit'] ?? true;
 
   @override
-  bool get failOnWarnings => true;
+  bool get failOnWarnings => _props['failOnWarnings'] ?? true;
 }
