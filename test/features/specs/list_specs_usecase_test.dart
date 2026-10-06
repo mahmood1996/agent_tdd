@@ -7,7 +7,8 @@ void main() {
   final harness = BaseTest()..setUpBase('list_specs_usecase_test_');
 
   group('ListSpecsUseCase Behavioral Solitary Unit Tests', () {
-    test('execute returns empty list and zero summary when no specs exist', () async {
+    test('execute returns empty list and zero summary when no specs exist',
+        () async {
       final useCase = ListSpecsUseCase(projectDir: harness.tempDir.path);
       final res = await useCase.execute();
 
@@ -16,7 +17,8 @@ void main() {
       expect(res.summary['completed'], equals(0));
     });
 
-    test('execute lists all specs and returns correct summary breakdown', () async {
+    test('execute lists all specs and returns correct summary breakdown',
+        () async {
       final addUseCase = AddSpecUseCase(projectDir: harness.tempDir.path);
       await addUseCase.execute('Feature A');
       await addUseCase.execute('Feature B');

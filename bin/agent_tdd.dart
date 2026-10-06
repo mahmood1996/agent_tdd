@@ -5,9 +5,15 @@ import 'package:agent_tdd/src/cli/logger.dart';
 
 void main(List<String> arguments) async {
   final parser = ArgParser()
-    ..addFlag('json', abbr: 'j', defaultsTo: true, negatable: true, help: 'Output machine-readable JSON for AI agents (default: true)')
-    ..addOption('project-dir', abbr: 'd', help: 'Project root directory (default: current directory)')
-    ..addFlag('help', abbr: 'h', negatable: false, help: 'Show usage information');
+    ..addFlag('json',
+        abbr: 'j',
+        defaultsTo: true,
+        negatable: true,
+        help: 'Output machine-readable JSON for AI agents (default: true)')
+    ..addOption('project-dir',
+        abbr: 'd', help: 'Project root directory (default: current directory)')
+    ..addFlag('help',
+        abbr: 'h', negatable: false, help: 'Show usage information');
 
   ArgResults results;
   try {
@@ -33,7 +39,8 @@ void main(List<String> arguments) async {
     return;
   }
 
-  final projectDir = results['project-dir']?.toString() ?? Directory.current.path;
+  final projectDir =
+      results['project-dir']?.toString() ?? Directory.current.path;
 
   final runner = CliRunner(projectDir: projectDir);
   final command = results.rest.first;

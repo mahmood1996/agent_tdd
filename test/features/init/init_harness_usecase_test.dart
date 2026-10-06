@@ -20,7 +20,8 @@ void main() {
       expect(res.config.runner, equals('dart'));
       expect(res.specCreated, isTrue);
       expect(
-        File(p.join(harness.tempDir.path, TddConfig.configFileName)).existsSync(),
+        File(p.join(harness.tempDir.path, TddConfig.configFileName))
+            .existsSync(),
         isTrue,
       );
     });

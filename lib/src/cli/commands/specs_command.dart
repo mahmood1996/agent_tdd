@@ -73,6 +73,7 @@ final class SpecsCommand {
     }
 
     final state = await tddCycle.savedTddState();
-    presenter.renderSpecsUnknownSubcommand(subCmd, state.phase.name.toUpperCase());
+    presenter.renderSpecsUnknownSubcommand(
+        subCmd, state.phase.name.toUpperCase());
   }
 }

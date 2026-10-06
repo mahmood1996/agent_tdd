@@ -16,7 +16,9 @@ void main() {
       expect(res.currentState.phase, equals(TddPhase.idle));
     });
 
-    test('execute succeeds, picks next pending spec, and transitions to RED phase', () async {
+    test(
+        'execute succeeds, picks next pending spec, and transitions to RED phase',
+        () async {
       final specStore = SpecStore(projectDir: harness.tempDir.path);
       await specStore.addSpec('Build User Profile');
 

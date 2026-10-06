@@ -39,5 +39,3 @@ final class ListSpecsUseCase {
     );
   }
 }
-
-

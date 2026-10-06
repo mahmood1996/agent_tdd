@@ -14,7 +14,8 @@ void main() {
 - [x] Task 2: Initial commit
 ''');
 
-      final importUseCase = ImportSpecsUseCase(projectDir: harness.tempDir.path);
+      final importUseCase =
+          ImportSpecsUseCase(projectDir: harness.tempDir.path);
       final res = await importUseCase.execute(mdFile.path);
 
       expect(res.filePath, equals(mdFile.path));

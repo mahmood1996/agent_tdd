@@ -1,127 +1,64 @@
-import 'dart:io';
-import 'package:path/path.dart' as p;
+abstract interface class TddConfig {
+  String get runner;
 
-final class TddConfig {
-  static Future<TddConfig> detectedOn(String projectDir) async {
-    final pubspecFile = File(p.join(projectDir, 'pubspec.yaml'));
-    if (await pubspecFile.exists()) {
-      final content = await pubspecFile.readAsString();
+  bool get gitCommit;
 
-      return (content.contains('sdk: flutter') || content.contains('flutter:'))
-          ? TddConfig.presets['flutter']!
-          : TddConfig.presets['dart']!;
-    }
+  String get testFiles;
 
-    if (await File(p.join(projectDir, 'Cargo.toml')).exists()) {
-      return TddConfig.presets['cargo']!;
-    }
+  String get testCommand;
 
-    if (await File(p.join(projectDir, 'go.mod')).exists()) {
-      return TddConfig.presets['go']!;
-    }
+  String get sourceFiles;
 
-    final pkgJsonFile = File(p.join(projectDir, 'package.json'));
-    if (await pkgJsonFile.exists()) {
-      final content = await pkgJsonFile.readAsString();
+  bool get failOnWarnings;
 
-      return content.contains('vitest')
-          ? TddConfig.presets['vitest']!
-          : TddConfig.presets['jest']!;
-    }
-
-    if (await File(p.join(projectDir, 'pytest.ini')).exists() ||
-        await File(p.join(projectDir, 'requirements.txt')).exists() ||
-        await File(p.join(projectDir, 'pyproject.toml')).exists()) {
-      return TddConfig.presets['pytest']!;
-    }
-
-    return TddConfig.presets['dart']!;
-  }
-
-  const TddConfig({
-    required this.runner,
-    required this.testCommand,
-    this.analyzeCommand,
-    required this.testFiles,
-    required this.sourceFiles,
-    this.failOnWarnings = true,
-    this.gitCommit = true,
-  });
-
-  final String runner;
-  final String testCommand;
-  final String? analyzeCommand;
-  final String testFiles;
-  final String sourceFiles;
-  final bool failOnWarnings;
-  final bool gitCommit;
-
-  TddConfig copyWith({
-    String? runner,
-    String? testCommand,
-    String? analyzeCommand,
-    String? testFiles,
-    String? sourceFiles,
-    bool? failOnWarnings,
-    bool? gitCommit,
-  }) {
-    return TddConfig(
-      runner: runner ?? this.runner,
-      testCommand: testCommand ?? this.testCommand,
-      analyzeCommand: analyzeCommand ?? this.analyzeCommand,
-      testFiles: testFiles ?? this.testFiles,
-      sourceFiles: sourceFiles ?? this.sourceFiles,
-      failOnWarnings: failOnWarnings ?? this.failOnWarnings,
-      gitCommit: gitCommit ?? this.gitCommit,
-    );
-  }
+  String? get analyzeCommand;
 
   static const String configFileName = '.tddrc.yaml';
 
-  static final Map<String, TddConfig> presets = {
-    'dart': const TddConfig(
+  static const Map<String, TddConfig> presets = {
+    'dart': const _TddConfigImpl(
       runner: 'dart',
       testCommand: 'dart test',
       analyzeCommand: 'dart analyze',
       testFiles: 'test/**/*_test.dart',
       sourceFiles: 'lib/**/*.dart',
     ),
-    'flutter': const TddConfig(
+    'flutter': const _TddConfigImpl(
       runner: 'flutter',
       testCommand: 'flutter test',
       analyzeCommand: 'flutter analyze',
       testFiles: 'test/**/*_test.dart',
       sourceFiles: 'lib/**/*.dart',
     ),
-    'vitest': const TddConfig(
+    'vitest': const _TddConfigImpl(
       runner: 'vitest',
       testCommand: 'npx vitest run',
       analyzeCommand: 'npx eslint . --max-warnings 0',
       testFiles: 'src/**/*.test.ts',
       sourceFiles: 'src/**/*.ts',
     ),
-    'jest': const TddConfig(
+    'jest': const _TddConfigImpl(
       runner: 'jest',
       testCommand: 'npx jest',
       analyzeCommand: 'npx eslint . --max-warnings 0',
       testFiles: 'src/**/*.test.js',
       sourceFiles: 'src/**/*.js',
     ),
-    'pytest': const TddConfig(
+    'pytest': const _TddConfigImpl(
       runner: 'pytest',
       testCommand: 'pytest',
       analyzeCommand: 'flake8',
       testFiles: 'tests/**/test_*.py',
       sourceFiles: 'src/**/*.py',
     ),
-    'go': const TddConfig(
+    'go': const _TddConfigImpl(
       runner: 'go',
       testCommand: 'go test ./...',
       analyzeCommand: 'go vet ./...',
       testFiles: '**/*_test.go',
       sourceFiles: '**/*.go',
     ),
-    'cargo': const TddConfig(
+    'cargo': const _TddConfigImpl(
       runner: 'cargo',
       testCommand: 'cargo test',
       analyzeCommand: 'cargo check',
@@ -129,16 +66,35 @@ final class TddConfig {
       sourceFiles: 'src/**/*.rs',
     ),
   };
+}
 
-  Map<String, dynamic> toJson() {
-    return {
-      'runner': runner,
-      'test_command': testCommand,
-      'analyze_command': analyzeCommand,
-      'test_files': testFiles,
-      'source_files': sourceFiles,
-      'fail_on_warnings': failOnWarnings,
-      'git_commit': gitCommit,
-    };
-  }
+final class _TddConfigImpl implements TddConfig {
+  const _TddConfigImpl({
+    required this.runner,
+    required this.testCommand,
+    this.analyzeCommand,
+    required this.testFiles,
+    required this.sourceFiles,
+  });
+
+  @override
+  final String runner;
+
+  @override
+  final String testCommand;
+
+  @override
+  final String? analyzeCommand;
+
+  @override
+  final String testFiles;
+
+  @override
+  final String sourceFiles;
+
+  @override
+  bool get gitCommit => true;
+
+  @override
+  bool get failOnWarnings => true;
 }

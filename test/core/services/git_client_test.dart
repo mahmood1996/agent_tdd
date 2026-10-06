@@ -10,7 +10,8 @@ void main() {
   final harness = BaseTest()..setUpBase('git_client_test_');
 
   group('GitClient Behavioral Solitary Unit Tests', () {
-    test('isGitRepo returns false when directory is not a git repository', () async {
+    test('isGitRepo returns false when directory is not a git repository',
+        () async {
       final client = GitClient(projectDir: harness.tempDir.path);
       final isRepo = await client.isGitRepo();
       expect(isRepo, isFalse);
@@ -24,9 +25,12 @@ void main() {
 
     test('isGitRepo and commit succeed in a valid git repository', () async {
       // Initialize git repo in tempDir
-      await Process.run('git', ['init'], workingDirectory: harness.tempDir.path);
-      await Process.run('git', ['config', 'user.name', 'Test User'], workingDirectory: harness.tempDir.path);
-      await Process.run('git', ['config', 'user.email', 'test@example.com'], workingDirectory: harness.tempDir.path);
+      await Process.run('git', ['init'],
+          workingDirectory: harness.tempDir.path);
+      await Process.run('git', ['config', 'user.name', 'Test User'],
+          workingDirectory: harness.tempDir.path);
+      await Process.run('git', ['config', 'user.email', 'test@example.com'],
+          workingDirectory: harness.tempDir.path);
 
       final client = GitClient(projectDir: harness.tempDir.path);
       final isRepo = await client.isGitRepo();

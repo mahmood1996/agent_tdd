@@ -13,7 +13,8 @@ final class VerificationPresenter extends BasePresenter {
     renderError(
       message: res.message,
       phase: res.state.phase.name.toUpperCase(),
-      activeSpec: activeSpecMap(res.state.activeSpecId, res.state.activeSpecTitle),
+      activeSpec:
+          activeSpecMap(res.state.activeSpecId, res.state.activeSpecTitle),
       allowedActions: allowedActionsMap(
         editableFiles: [config.testFiles],
         readOnlyFiles: [config.sourceFiles, 'specs.yaml', '.tddrc.yaml'],

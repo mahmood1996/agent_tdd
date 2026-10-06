@@ -21,6 +21,8 @@ dependencies:
     path: packages/agent_backlog
   usecase: 
     path: packages/usecase
+  config:
+    path: packages/config
 
 dev_dependencies:
   test: ^1.25.0

@@ -17,5 +17,4 @@ final class JsonConfig implements ReadableConfig {
     final value when value is V => value,
     _ => fallback,
   };
-
 }

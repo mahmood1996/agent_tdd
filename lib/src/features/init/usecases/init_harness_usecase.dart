@@ -1,4 +1,5 @@
 import '../../../core/data/config_store.dart';
+import '../../../core/data/config_detection.dart';
 import '../../../core/data/spec_store.dart';
 import '../../../core/domain/tdd_config.dart';
 
@@ -30,7 +31,7 @@ final class InitHarnessUseCase {
 
   Future<InitHarnessResult> execute({String? runnerPreset}) async {
     final config = TddConfig.presets[runnerPreset] ??
-        await TddConfig.detectedOn(projectDir);
+        (await ConfigDetection().detectConfig(projectDir))!;
 
     await configStore.save(config);
 

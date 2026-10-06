@@ -20,5 +20,3 @@ final class ImportSpecsUseCase {
     return ImportSpecsResult(filePath: filePath);
   }
 }
-
-

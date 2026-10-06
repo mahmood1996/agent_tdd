@@ -9,7 +9,8 @@ void main() {
   group('AddSpecUseCase Behavioral Solitary Unit Tests', () {
     test('execute adds spec item with title and description', () async {
       final useCase = AddSpecUseCase(projectDir: harness.tempDir.path);
-      final res = await useCase.execute('User Authentication', description: 'Implement JWT login');
+      final res = await useCase.execute('User Authentication',
+          description: 'Implement JWT login');
 
       expect(res.newSpec.id, equals(1));
       expect(res.newSpec.title, equals('User Authentication'));

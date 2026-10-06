@@ -7,7 +7,8 @@ void main() {
   final harness = BaseTest()..setUpBase('process_runner_test_');
 
   group('Processes & ExecutableProcess Solitary Unit Tests', () {
-    test('execute runs successful command and invokes onFinished callback', () async {
+    test('execute runs successful command and invokes onFinished callback',
+        () async {
       final processes = Processes(harness.tempDir.path);
       ExecutableProcessResult? res;
 

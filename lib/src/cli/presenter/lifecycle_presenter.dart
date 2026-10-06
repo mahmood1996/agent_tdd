@@ -60,7 +60,8 @@ final class LifecyclePresenter extends BasePresenter {
   void renderComplete(CompleteCycleResult res) {
     if (!res.success) {
       renderError(
-          message: res.message, phase: res.currentState.phase.name.toUpperCase());
+          message: res.message,
+          phase: res.currentState.phase.name.toUpperCase());
       return;
     }
 

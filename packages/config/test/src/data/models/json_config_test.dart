@@ -4,7 +4,9 @@ import 'package:config/config.dart';
 void main() {
   group('JsonConfig', () {
     test('retrieves existing value by key', () {
-      final ReadableConfig config = JsonConfig('{"name": "Agent", "port": 8080}');
+      final ReadableConfig config = JsonConfig(
+        '{"name": "Agent", "port": 8080}',
+      );
       expect(config.valueBy<String>('name', 'Default'), equals('Agent'));
       expect(config.valueBy<int>('port', 80), equals(8080));
     });

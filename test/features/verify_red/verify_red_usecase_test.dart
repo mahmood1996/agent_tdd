@@ -51,10 +51,13 @@ void main() {
       final res = await useCase.execute();
 
       expect(res.success, isFalse);
-      expect(res.message, contains('verify-red can only be run during RED phase'));
+      expect(
+          res.message, contains('verify-red can only be run during RED phase'));
     });
 
-    test('execute transitions to alreadyPassed phase when tests pass during RED phase', () async {
+    test(
+        'execute transitions to alreadyPassed phase when tests pass during RED phase',
+        () async {
       final specStore = SpecStore(projectDir: harness.tempDir.path);
       await specStore.addSpec('Spec 1');
       final cycle = TddCycle(projectDir: harness.tempDir.path);
@@ -90,15 +93,19 @@ void main() {
       final res = await useCase.execute();
       expect(res.success, isTrue);
       expect(res.state.phase, equals(TddPhase.alreadyPassed));
-      expect(res.message, contains('Test PASSED! Spec requirement is already satisfied'));
+      expect(res.message,
+          contains('Test PASSED! Spec requirement is already satisfied'));
 
       final updatedSpec = await specStore.activeSpec();
       expect(updatedSpec?.status, equals('already_passed'));
     });
 
-    test('execute succeeds on test failure, advances to GREEN phase, and triggers git commit', () async {
+    test(
+        'execute succeeds on test failure, advances to GREEN phase, and triggers git commit',
+        () async {
       harness.createFile('pubspec.yaml', 'name: my_app\n');
-      harness.createFile('test/sample_test.dart', 'void main() { throw Exception("fail"); }');
+      harness.createFile(
+          'test/sample_test.dart', 'void main() { throw Exception("fail"); }');
 
       final specStore = SpecStore(projectDir: harness.tempDir.path);
       await specStore.addSpec('Spec 1');
@@ -138,7 +145,8 @@ void main() {
 
       expect(res.success, isTrue);
       expect(res.state.phase, equals(TddPhase.green));
-      expect(res.message, contains('RED state verified! Phase advanced to GREEN.'));
+      expect(res.message,
+          contains('RED state verified! Phase advanced to GREEN.'));
       expect(mockGit.lastCommitMessage, contains('🔴 RED: Spec #1 Spec 1'));
 
       final updatedSpec = await specStore.activeSpec();

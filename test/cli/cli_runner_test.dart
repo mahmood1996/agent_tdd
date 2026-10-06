@@ -200,7 +200,8 @@ void main() {
         testRunVerifications: mockRunner,
       );
 
-      await CliRunner(projectDir: harness.tempDir.path).runCommand('init', ['dart']);
+      await CliRunner(projectDir: harness.tempDir.path)
+          .runCommand('init', ['dart']);
       await runner.runCommand('specs', ['add', 'Test Spec']);
       await runner.runCommand('next');
 
@@ -234,7 +235,8 @@ void main() {
         testRunVerifications: mockRunner,
       );
 
-      await CliRunner(projectDir: harness.tempDir.path).runCommand('init', ['dart']);
+      await CliRunner(projectDir: harness.tempDir.path)
+          .runCommand('init', ['dart']);
       await runner.runCommand('specs', ['add', 'Test Spec']);
       await runner.runCommand('next');
 
@@ -243,8 +245,10 @@ void main() {
       );
       expect(json['success'], isFalse);
       expect(json['phase'], equals('RED'));
-      expect(json['allowed_actions']['editable_files'], equals(['test/**/*_test.dart']));
-      expect(json['allowed_actions']['read_only_files'], contains('lib/**/*.dart'));
+      expect(json['allowed_actions']['editable_files'],
+          equals(['test/**/*_test.dart']));
+      expect(json['allowed_actions']['read_only_files'],
+          contains('lib/**/*.dart'));
     });
 
     test('unknown command outputs error JSON', () async {

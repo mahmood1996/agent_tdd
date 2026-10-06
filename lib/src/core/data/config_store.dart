@@ -1,66 +1,91 @@
 import 'dart:io';
 import 'package:path/path.dart' as p;
-import 'package:yaml/yaml.dart';
-import '../domain/tdd_config.dart';
 
-final class ConfigStore {
-  ConfigStore({required String projectDir}) : _projectDir = projectDir;
+import 'package:config/config.dart';
+
+import '../domain/tdd_config.dart';
+import 'config_detection.dart';
+
+abstract interface class ConfigStore {
+  factory ConfigStore({required String projectDir}) = _ConfigStoreImpl;
+
+  Future<TddConfig> config();
+
+  Future<void> save(TddConfig config);
+}
+
+final class _ConfigStoreImpl implements ConfigStore {
+  _ConfigStoreImpl({
+    required String projectDir,
+    ConfigDetection? detection,
+  })  : _projectDir = projectDir,
+        _fileStore =
+            FileConfigStore(p.join(projectDir, TddConfig.configFileName)),
+        _detection = detection ?? ConfigDetection();
 
   final String _projectDir;
+  final FileConfigStore _fileStore;
+  final ConfigDetection _detection;
 
-  /// Fetches the project's configuration (loads from .tddrc.yaml if present, or auto-detects).
-  Future<TddConfig> config() async {
-    final configFile = _configFile;
+  @override
+  Future<TddConfig> config() async =>
+      await File(p.join(_projectDir, TddConfig.configFileName)).exists()
+          ? _TddConfig(await _fileStore.config())
+          : (await _detection.detectConfig(_projectDir))!;
 
-    return (await configFile.exists())
-        ? await _savedConfigFrom(configFile.path)
-        : await TddConfig.detectedOn(_projectDir);
-  }
+  @override
+  Future<void> save(TddConfig config) async =>
+      await _fileStore.save(_SerializedTddConfig(config));
+}
 
-  Future<TddConfig> _savedConfigFrom(String filePath) async {
-    final file = File(filePath);
-    if (!await file.exists()) {
-      throw Exception('Configuration file not found: $filePath');
-    }
-    final content = await file.readAsString();
-    final doc = loadYaml(content);
-    if (doc is! Map) {
-      throw Exception('Invalid YAML configuration format in $filePath');
-    }
+/// Private class implementing [TddConfig] by wrapping a [ReadableConfig]
+final class _TddConfig implements TddConfig {
+  const _TddConfig(this._readable);
 
-    final String runner = doc['runner']?.toString() ?? 'custom';
-    final preset = TddConfig.presets[runner];
+  final ReadableConfig _readable;
 
-    return TddConfig(
-      runner: runner,
-      testCommand:
-          doc['test_command']?.toString() ?? preset?.testCommand ?? 'dart test',
-      analyzeCommand:
-          doc['analyze_command']?.toString() ?? preset?.analyzeCommand,
-      testFiles: doc['test_files']?.toString() ??
-          preset?.testFiles ??
-          'test/**/*_test.dart',
-      sourceFiles: doc['source_files']?.toString() ??
-          preset?.sourceFiles ??
-          'lib/**/*.dart',
-      failOnWarnings: doc['fail_on_warnings'] as bool? ?? true,
-      gitCommit: doc['git_commit'] as bool? ?? true,
-    );
-  }
+  @override
+  String get runner => _readable.valueBy<String>('runner', 'custom');
 
-  Future<void> save(TddConfig config) async {
-    final yamlContent = StringBuffer()
-      ..writeln('# agent-tdd Configuration')
-      ..writeln('runner: "${config.runner}"')
-      ..writeln('test_command: "${config.testCommand}"')
-      ..writeln('analyze_command: "${config.analyzeCommand ?? ''}"')
-      ..writeln('test_files: "${config.testFiles}"')
-      ..writeln('source_files: "${config.sourceFiles}"')
-      ..writeln('fail_on_warnings: ${config.failOnWarnings}')
-      ..writeln('git_commit: ${config.gitCommit}');
+  TddConfig? get _preset => TddConfig.presets[runner];
 
-    await _configFile.writeAsString(yamlContent.toString());
-  }
+  @override
+  String get testCommand => _readable.valueBy<String>(
+      'test_command', _preset?.testCommand ?? 'dart test');
 
-  File get _configFile => File(p.join(_projectDir, TddConfig.configFileName));
+  @override
+  String? get analyzeCommand =>
+      _readable.valueBy<String?>('analyze_command', _preset?.analyzeCommand);
+
+  @override
+  String get testFiles => _readable.valueBy<String>(
+      'test_files', _preset?.testFiles ?? 'test/**/*_test.dart');
+
+  @override
+  String get sourceFiles => _readable.valueBy<String>(
+      'source_files', _preset?.sourceFiles ?? 'lib/**/*.dart');
+
+  @override
+  bool get failOnWarnings => _readable.valueBy<bool>('fail_on_warnings', true);
+
+  @override
+  bool get gitCommit => _readable.valueBy<bool>('git_commit', true);
+}
+
+/// Private class implementing [SerializableConfig] by wrapping a [TddConfig]
+final class _SerializedTddConfig implements SerializableConfig {
+  const _SerializedTddConfig(this._config);
+
+  final TddConfig _config;
+
+  @override
+  Map<String, dynamic> toMap() => {
+        'runner': _config.runner,
+        'test_command': _config.testCommand,
+        'analyze_command': _config.analyzeCommand,
+        'test_files': _config.testFiles,
+        'source_files': _config.sourceFiles,
+        'fail_on_warnings': _config.failOnWarnings,
+        'git_commit': _config.gitCommit,
+      };
 }

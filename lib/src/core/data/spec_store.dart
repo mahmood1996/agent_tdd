@@ -154,6 +154,7 @@ extension SmartSpecStore on SpecStore {
       (await specs()).where((s) => s.status == 'pending').firstOrNull;
 
   Future<SpecItem?> activeSpec() async => (await specs())
-      .where((s) => ['red', 'green', 'refactor', 'already_passed'].any((e) => s.status == e))
+      .where((s) => ['red', 'green', 'refactor', 'already_passed']
+          .any((e) => s.status == e))
       .firstOrNull;
 }

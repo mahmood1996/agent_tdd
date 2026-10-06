@@ -65,8 +65,10 @@ final class TddState {
       phase: phase,
       activeSpecId: json['active_spec_id'] as int?,
       activeSpecTitle: json['active_spec_title'] as String?,
-      startedAt: DateTime.tryParse(json['started_at']?.toString() ?? '') ?? DateTime.now(),
-      lastUpdated: DateTime.tryParse(json['last_updated']?.toString() ?? '') ?? DateTime.now(),
+      startedAt: DateTime.tryParse(json['started_at']?.toString() ?? '') ??
+          DateTime.now(),
+      lastUpdated: DateTime.tryParse(json['last_updated']?.toString() ?? '') ??
+          DateTime.now(),
     );
   }
 

@@ -54,5 +54,6 @@ final class SpecItem {
           status == other.status;
 
   @override
-  int get hashCode => id.hashCode ^ title.hashCode ^ description.hashCode ^ status.hashCode;
+  int get hashCode =>
+      id.hashCode ^ title.hashCode ^ description.hashCode ^ status.hashCode;
 }
