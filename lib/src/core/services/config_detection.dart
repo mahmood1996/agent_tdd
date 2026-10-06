@@ -10,19 +10,22 @@ abstract interface class ConfigDetection {
 }
 
 final class _DefaultConfigDetection implements ConfigDetection {
-  const _DefaultConfigDetection();
+  const _DefaultConfigDetection()
+      : _chain = const _DetectionChain([
+          _DartFlutterDetection(),
+          _CargoDetection(),
+          _GoDetection(),
+          _NodeDetection(),
+          _PythonDetection(),
+          _FallbackDetection(),
+        ]);
 
-  static const _chain = _DetectionChain([
-    _DartFlutterDetection(),
-    _CargoDetection(),
-    _GoDetection(),
-    _NodeDetection(),
-    _PythonDetection(),
-    _FallbackDetection(),
-  ]);
+  final ConfigDetection _chain;
 
   @override
-  Future<TddConfig?> detectConfig(String projectDir) =>
+  Future<TddConfig?> detectConfig(
+    String projectDir,
+  ) =>
       _chain.detectConfig(projectDir);
 }
 

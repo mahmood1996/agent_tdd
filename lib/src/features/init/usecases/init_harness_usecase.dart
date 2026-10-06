@@ -1,5 +1,5 @@
 import '../../../core/data/config_store.dart';
-import '../../../core/data/config_detection.dart';
+import '../../../core/services/config_detection.dart';
 import '../../../core/data/spec_store.dart';
 import '../../../core/domain/tdd_config.dart';
 

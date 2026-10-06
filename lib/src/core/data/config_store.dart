@@ -4,7 +4,7 @@ import 'package:path/path.dart' as p;
 import 'package:config/config.dart';
 
 import '../domain/tdd_config.dart';
-import 'config_detection.dart';
+import '../services/config_detection.dart';
 
 abstract interface class ConfigStore {
   factory ConfigStore({required String projectDir}) = _ConfigStoreImpl;
