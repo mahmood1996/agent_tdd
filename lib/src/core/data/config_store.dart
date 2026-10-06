@@ -35,11 +35,6 @@ final class _TddConfig implements TddConfig {
   final ReadableConfig _readable;
 
   @override
-  String get runner => _readable.valueBy<String>('runner', 'custom');
-
-  TddConfig? get _preset => TddConfig.fromPreset(runner);
-
-  @override
   String get testCommand =>
       _readable.valueBy<String>('test_command', _preset?.testCommand ?? '');
 
@@ -54,6 +49,11 @@ final class _TddConfig implements TddConfig {
   @override
   String get sourceFiles =>
       _readable.valueBy<String>('source_files', _preset?.sourceFiles ?? '');
+
+  TddConfig? get _preset => TddConfig.fromPreset(runner);
+
+  @override
+  String get runner => _readable.valueBy<String>('runner', '');
 
   @override
   bool get failOnWarnings => _readable.valueBy<bool>('fail_on_warnings', true);
