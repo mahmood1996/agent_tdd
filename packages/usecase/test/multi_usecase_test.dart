@@ -6,8 +6,8 @@ void main() {
     int actionCounter = 0;
 
     final usecase = MultiUsecase([
-      _Usecase(() async => actionCounter++),
-      _Usecase(() async => actionCounter++),
+      ActionUsecase(() async => actionCounter++),
+      ActionUsecase(() async => actionCounter++),
     ]);
 
     expect(actionCounter, 0);
@@ -16,13 +16,4 @@ void main() {
 
     expect(actionCounter, 2);
   });
-}
-
-final class _Usecase implements Usecase<void> {
-  const _Usecase(this._action);
-
-  final Future<void> Function() _action;
-
-  @override
-  Future<void> call() async => _action();
 }
