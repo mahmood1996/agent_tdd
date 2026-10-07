@@ -32,10 +32,6 @@ final class FileConfigStore implements ConfigStore {
   }
 
   @override
-  Future<void> save(SerializableConfig conf) async {
-    final map = conf.toMap();
-    final yamlWriter = YamlWriter();
-    final yamlString = yamlWriter.write(map);
-    await _file.writeAsString(yamlString);
-  }
+  Future<void> save(SerializableConfig conf) async =>
+      await _file.writeAsString(YamlWriter().write(conf.toMap()));
 }
