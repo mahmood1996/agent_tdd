@@ -23,10 +23,11 @@ class Analyzer {
         isClean: true,
         issues: [],
         rawResult: const ExecutableProcessResult(
-            exitCode: 0,
-            stdout: 'No analyze_command configured.',
-            stderr: '',
-            durationMs: 0),
+          exitCode: 0,
+          stdout: 'No analyze_command configured.',
+          stderr: '',
+          durationMs: 0,
+        ),
       );
     }
 

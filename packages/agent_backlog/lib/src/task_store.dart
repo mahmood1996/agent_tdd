@@ -21,7 +21,7 @@ extension SmartTaskStore on TaskStore {
   ) async =>
       await saveTasks(
         (await tasks())
-            .map((t) => t.id == taskId ? t.copyWith(status: 'done') : t)
+            .map((t) => t.id == taskId ? t.markedAsDone() : t)
             .toList(),
       );
 
