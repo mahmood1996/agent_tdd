@@ -16,6 +16,16 @@ extension SmartHarnessTask on HarnessTask {
 
   bool get isInProgress => status == 'in_progress';
 
+  /// Returns a new task with the status set to 'done'
+  HarnessTask markedAsDone() => copyWith(status: 'done');
+
+  /// Returns a new task with the status set to 'pending'
+  HarnessTask markedAsPending() => copyWith(status: 'pending');
+
+  /// Returns a new task with the status set to 'in_progress'
+  HarnessTask markedAsInProgress() => copyWith(status: 'in_progress');
+
+  /// Returns a copy of the task with the specified fields updated
   HarnessTask copyWith({
     int? id,
     String? title,
