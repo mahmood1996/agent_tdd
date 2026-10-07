@@ -1,5 +1,5 @@
 /// Abstract interface contract representing a task or feature spec item in a backlog
-abstract interface class HarnessTask {
+abstract interface class Spec {
   int get id;
 
   String get title;
@@ -11,31 +11,31 @@ abstract interface class HarnessTask {
   Map<String, dynamic> get metadata;
 }
 
-extension SmartHarnessTask on HarnessTask {
+extension SmartSpec on Spec {
   bool get isDone => status == 'done';
 
   bool get isPending => status == 'pending';
 
   bool get isInProgress => status == 'in_progress';
 
-  /// Returns a new task with the status set to 'done'
-  HarnessTask markedAsDone() => copyWith(status: 'done');
+  /// Returns a new spec with the status set to 'done'
+  Spec markedAsDone() => copyWith(status: 'done');
 
-  /// Returns a new task with the status set to 'pending'
-  HarnessTask markedAsPending() => copyWith(status: 'pending');
+  /// Returns a new spec with the status set to 'pending'
+  Spec markedAsPending() => copyWith(status: 'pending');
 
-  /// Returns a new task with the status set to 'in_progress'
-  HarnessTask markedAsInProgress() => copyWith(status: 'in_progress');
+  /// Returns a new spec with the status set to 'in_progress'
+  Spec markedAsInProgress() => copyWith(status: 'in_progress');
 
-  /// Returns a copy of the task with the specified fields updated
-  HarnessTask copyWith({
+  /// Returns a copy of the spec with the specified fields updated
+  Spec copyWith({
     int? id,
     String? title,
     String? description,
     String? status,
     Map<String, dynamic>? metadata,
   }) =>
-      _HarnessTaskCopy(
+      _SpecCopy(
         origin: this,
         methods: {
           if (id != null) #id: () => id,
@@ -57,14 +57,14 @@ extension SmartHarnessTask on HarnessTask {
   }
 }
 
-final class _HarnessTaskCopy implements HarnessTask {
-  _HarnessTaskCopy({
-    required HarnessTask origin,
+final class _SpecCopy implements Spec {
+  _SpecCopy({
+    required Spec origin,
     required Map<Symbol, Function> methods,
   })  : _origin = origin,
         _methods = Map.unmodifiable(methods);
 
-  final HarnessTask _origin;
+  final Spec _origin;
 
   final Map<Symbol, Function> _methods;
 

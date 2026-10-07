@@ -3,31 +3,31 @@ import 'package:path/path.dart' as p;
 import 'package:yaml/yaml.dart';
 import 'package:yaml_writer/yaml_writer.dart';
 
-import 'models/harness_task.dart';
-import 'task_store.dart';
+import 'models/spec.dart';
+import 'spec_store.dart';
 
-/// [TaskStore] implementation that persists [HarnessTask] list to YAML files on disk.
-final class FileTaskStore implements TaskStore {
+/// [SpecStore] implementation that persists [Spec] list to YAML files on disk.
+final class FileSpecStore implements SpecStore {
   final String saveDir;
   final String filePath;
 
-  FileTaskStore(this.saveDir, this.filePath);
+  FileSpecStore(this.saveDir, this.filePath);
 
   @override
-  Future<List<HarnessTask>> tasks() async {
+  Future<List<Spec>> specs() async {
     try {
-      return await _tryGettingSavedTasks();
+      return await _tryGettingSavedSpecs();
     } on FileSystemException {
       return [];
     }
   }
 
-  Future<List<HarnessTask>> _tryGettingSavedTasks() async {
+  Future<List<Spec>> _tryGettingSavedSpecs() async {
     return !await _file.exists()
-        ? const <HarnessTask>[]
+        ? const <Spec>[]
         : List.from(loadYaml(await _file.readAsString()) ?? const [])
             .map(
-              (item) => _HarnessTask.fromMap(
+              (item) => _Spec.fromMap(
                 Map<String, dynamic>.from(item),
               ),
             )
@@ -35,10 +35,10 @@ final class FileTaskStore implements TaskStore {
   }
 
   @override
-  Future<void> saveTasks(List<HarnessTask> tasks) async {
+  Future<void> saveSpecs(List<Spec> specs) async {
     await _createSaveDirIfNeeded(_file);
 
-    final dataList = tasks.map((t) => _HarnessTask(t).toMap()).toList();
+    final dataList = specs.map((t) => _Spec(t).toMap()).toList();
 
     await _file.writeAsString(
       YamlWriter(
@@ -56,16 +56,16 @@ final class FileTaskStore implements TaskStore {
   File get _file => File(p.join(saveDir, filePath));
 }
 
-/// Internal implementation of [HarnessTask] for YAML serialization.
-final class _HarnessTask implements HarnessTask {
-  _HarnessTask(HarnessTask task)
-      : id = task.id,
-        title = task.title,
-        status = task.status,
-        description = task.description,
-        metadata = Map<String, dynamic>.unmodifiable(task.metadata);
+/// Internal implementation of [Spec] for YAML serialization.
+final class _Spec implements Spec {
+  _Spec(Spec spec)
+      : id = spec.id,
+        title = spec.title,
+        status = spec.status,
+        description = spec.description,
+        metadata = Map<String, dynamic>.unmodifiable(spec.metadata);
 
-  _HarnessTask.raw({
+  _Spec.raw({
     required this.id,
     required this.title,
     required this.status,
@@ -73,8 +73,8 @@ final class _HarnessTask implements HarnessTask {
     required this.description,
   });
 
-  factory _HarnessTask.fromMap(Map<String, dynamic> map) {
-    return _HarnessTask.raw(
+  factory _Spec.fromMap(Map<String, dynamic> map) {
+    return _Spec.raw(
       id: map['id'] as int? ?? 0,
       title: map['title']?.toString() ?? '',
       description: map['description']?.toString() ?? '',

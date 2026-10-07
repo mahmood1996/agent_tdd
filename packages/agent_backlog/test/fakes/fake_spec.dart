@@ -1,7 +1,7 @@
 import 'package:agent_backlog/agent_backlog.dart';
 
-final class FakeHarnessTask implements HarnessTask {
-  const FakeHarnessTask({
+final class FakeSpec implements Spec {
+  const FakeSpec({
     required this.id,
     required this.title,
     required this.description,

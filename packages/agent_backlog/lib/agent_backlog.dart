@@ -1,5 +1,5 @@
 library agent_backlog;
 
-export 'src/models/harness_task.dart';
-export 'src/task_store.dart';
-export 'src/file_task_store.dart';
+export 'src/models/spec.dart';
+export 'src/spec_store.dart';
+export 'src/file_spec_store.dart';

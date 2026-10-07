@@ -1,33 +1,33 @@
 import 'package:agent_backlog/agent_backlog.dart';
 import 'package:test/test.dart';
 
-Matcher isHarnessTask({
+Matcher isSpec({
   Object? id = anything,
   Object? title = anything,
   Object? status = anything,
   Object? metadata = anything,
 }) =>
-    _HarnessTaskMatcher(
+    _SpecMatcher(
       id: wrapMatcher(id),
       title: wrapMatcher(title),
       status: wrapMatcher(status),
       metadata: wrapMatcher(metadata),
     );
 
-Matcher equalsHarnessTask(HarnessTask expected) => isHarnessTask(
+Matcher equalsSpec(Spec expected) => isSpec(
       id: expected.id,
       title: expected.title,
       status: expected.status,
       metadata: expected.metadata,
     );
 
-final class _HarnessTaskMatcher extends Matcher {
+final class _SpecMatcher extends Matcher {
   final Matcher id;
   final Matcher title;
   final Matcher status;
   final Matcher metadata;
 
-  _HarnessTaskMatcher({
+  _SpecMatcher({
     required this.id,
     required this.title,
     required this.status,
@@ -36,7 +36,7 @@ final class _HarnessTaskMatcher extends Matcher {
 
   @override
   bool matches(dynamic item, Map matchState) {
-    if (item is! HarnessTask) return false;
+    if (item is! Spec) return false;
     return id.matches(item.id, matchState) &&
         title.matches(item.title, matchState) &&
         status.matches(item.status, matchState) &&
@@ -45,6 +45,6 @@ final class _HarnessTaskMatcher extends Matcher {
 
   @override
   Description describe(Description description) {
-    return description.add('a HarnessTask matching properties');
+    return description.add('a Spec matching properties');
   }
 }

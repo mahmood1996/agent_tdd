@@ -1,23 +1,23 @@
 import 'package:agent_backlog/agent_backlog.dart';
 import 'package:test/test.dart';
 
-import '../fakes/fake_harness_task.dart';
+import '../fakes/fake_spec.dart';
 
 void main() {
-  group('SmartHarnessTask extension Tests', () {
-    test('SmartHarnessTask getters and copyWith', () {
-      final task = const FakeHarnessTask(
+  group('SmartSpec extension Tests', () {
+    test('SmartSpec getters and copyWith', () {
+      final spec = const FakeSpec(
         id: 1,
         title: 'Build authentication endpoint',
         description: 'Implement login and register',
         status: 'pending',
       );
 
-      expect(task.isPending, isTrue);
-      expect(task.isDone, isFalse);
-      expect(task.isInProgress, isFalse);
+      expect(spec.isPending, isTrue);
+      expect(spec.isDone, isFalse);
+      expect(spec.isInProgress, isFalse);
 
-      final copy = task.copyWith(status: 'done');
+      final copy = spec.copyWith(status: 'done');
       expect(copy.id, equals(1));
       expect(copy.title, equals('Build authentication endpoint'));
       expect(copy.isDone, isTrue);

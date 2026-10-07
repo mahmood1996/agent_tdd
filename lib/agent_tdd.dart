@@ -1,6 +1,5 @@
 // Package exports
 export 'package:agent_harness/agent_harness.dart';
-export 'package:agent_backlog/agent_backlog.dart';
 
 // Core exports
 export 'src/core/domain/spec_item.dart';
