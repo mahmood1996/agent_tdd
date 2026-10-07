@@ -26,12 +26,14 @@ void main() {
         const FakeHarnessTask(
           id: 1,
           title: 'Task 1',
+          description: 'desc 1',
           status: 'pending',
           metadata: {'meta': 'val'},
         ),
         const FakeHarnessTask(
           id: 2,
           title: 'Task 2',
+          description: 'desc 2',
           status: 'done',
         ),
       ];
@@ -50,6 +52,7 @@ void main() {
         const FakeHarnessTask(
           id: 1,
           title: 'Task 1',
+          description: 'desc 1',
           status: 'pending',
           metadata: {},
         ),
@@ -76,8 +79,8 @@ void main() {
     test('FileTaskStore workflow with SmartTaskStore extension', () async {
       final store = FileTaskStore(tempDir.path, 'tasks.yaml');
       await store.saveTasks([
-        const FakeHarnessTask(id: 1, title: 'Item 1', status: 'pending'),
-        const FakeHarnessTask(id: 2, title: 'Item 2', status: 'pending'),
+        const FakeHarnessTask(id: 1, title: 'Item 1', description: 'desc 1', status: 'pending'),
+        const FakeHarnessTask(id: 2, title: 'Item 2', description: 'desc 2', status: 'pending'),
       ]);
 
       final next = await store.nextPendingTask();

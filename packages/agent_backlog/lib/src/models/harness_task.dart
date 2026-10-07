@@ -4,6 +4,8 @@ abstract interface class HarnessTask {
 
   String get title;
 
+  String get description;
+
   String get status;
 
   Map<String, dynamic> get metadata;
@@ -29,6 +31,7 @@ extension SmartHarnessTask on HarnessTask {
   HarnessTask copyWith({
     int? id,
     String? title,
+    String? description,
     String? status,
     Map<String, dynamic>? metadata,
   }) =>
@@ -37,6 +40,7 @@ extension SmartHarnessTask on HarnessTask {
         methods: {
           if (id != null) #id: () => id,
           if (title != null) #title: () => title,
+          if (description != null) #description: () => description,
           if (status != null) #status: () => status,
           if (metadata != null) #metadata: () => metadata,
         },
@@ -59,6 +63,9 @@ final class _HarnessTaskCopy implements HarnessTask {
 
   @override
   String get title => _method(#title)?.call() ?? _origin.title;
+
+  @override
+  String get description => _method(#description)?.call() ?? _origin.description;
 
   @override
   String get status => _method(#status)?.call() ?? _origin.status;

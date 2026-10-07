@@ -60,6 +60,7 @@ final class _HarnessTask implements HarnessTask {
       : id = task.id,
         title = task.title,
         status = task.status,
+        description = task.description,
         metadata = Map<String, dynamic>.unmodifiable(task.metadata);
 
   _HarnessTask.raw({
@@ -67,12 +68,14 @@ final class _HarnessTask implements HarnessTask {
     required this.title,
     required this.status,
     required this.metadata,
+    required this.description,
   });
 
   factory _HarnessTask.fromMap(Map<String, dynamic> map) {
     return _HarnessTask.raw(
       id: map['id'] as int? ?? 0,
       title: map['title']?.toString() ?? '',
+      description: map['description']?.toString() ?? '',
       status: map['status']?.toString() ?? 'pending',
       metadata: map['metadata'] != null
           ? Map<String, dynamic>.from(map['metadata'] as Map)
@@ -87,6 +90,9 @@ final class _HarnessTask implements HarnessTask {
   final String title;
 
   @override
+  final String description;
+
+  @override
   final String status;
 
   @override
@@ -97,5 +103,6 @@ final class _HarnessTask implements HarnessTask {
         'title': title,
         'status': status,
         'metadata': metadata,
+        'description': description,
       };
 }

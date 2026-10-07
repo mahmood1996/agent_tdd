@@ -4,6 +4,7 @@ final class FakeHarnessTask implements HarnessTask {
   const FakeHarnessTask({
     required this.id,
     required this.title,
+    required this.description,
     required this.status,
     this.metadata = const {},
   });
@@ -13,6 +14,9 @@ final class FakeHarnessTask implements HarnessTask {
 
   @override
   final String title;
+
+  @override
+  final String description;
 
   @override
   final String status;

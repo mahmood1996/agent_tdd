@@ -9,6 +9,7 @@ void main() {
       final task = const FakeHarnessTask(
         id: 1,
         title: 'Build authentication endpoint',
+        description: 'Implement login and register',
         status: 'pending',
       );
 
