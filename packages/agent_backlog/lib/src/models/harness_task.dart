@@ -65,7 +65,8 @@ final class _HarnessTaskCopy implements HarnessTask {
   String get title => _method(#title)?.call() ?? _origin.title;
 
   @override
-  String get description => _method(#description)?.call() ?? _origin.description;
+  String get description =>
+      _method(#description)?.call() ?? _origin.description;
 
   @override
   String get status => _method(#status)?.call() ?? _origin.status;
