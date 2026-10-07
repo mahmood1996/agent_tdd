@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'models/harness_task.dart';
 
 /// Abstract interface for task backlog storage and retrieval
@@ -32,4 +34,22 @@ extension SmartTaskStore on TaskStore {
             .map((t) => t.id == taskId ? t.copyWith(status: status) : t)
             .toList(),
       );
+
+  Future<Map<String, dynamic>> summary() async {
+    final list = await tasks();
+    final total = list.length;
+    final completed = list.where((s) => s.isDone).length;
+    final percentage = total == 0 ? 0 : ((completed / total) * 100).round();
+
+    return {
+      'total': total,
+      'completed': completed,
+      'percentage': percentage,
+      'active_spec': (await _activeTask())?.toJson(),
+      'specs': list.map((s) => s.toJson()).toList(),
+    };
+  }
+
+  Future<HarnessTask?> _activeTask() async =>
+      (await tasks()).where((t) => !t.isDone).firstOrNull;
 }

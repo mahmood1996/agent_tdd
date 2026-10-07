@@ -45,6 +45,16 @@ extension SmartHarnessTask on HarnessTask {
           if (metadata != null) #metadata: () => metadata,
         },
       );
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'status': status,
+      'metadata': metadata,
+      'description': description,
+    };
+  }
 }
 
 final class _HarnessTaskCopy implements HarnessTask {

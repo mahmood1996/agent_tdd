@@ -23,15 +23,15 @@ final class FileTaskStore implements TaskStore {
   }
 
   Future<List<HarnessTask>> _tryGettingSavedTasks() async {
-    if (!await _file.exists()) return [];
-
-    return List.from(loadYaml(await _file.readAsString()) ?? const [])
-        .map(
-          (item) => _HarnessTask.fromMap(
-            Map<String, dynamic>.from(item),
-          ),
-        )
-        .toList();
+    return !await _file.exists()
+        ? const <HarnessTask>[]
+        : List.from(loadYaml(await _file.readAsString()) ?? const [])
+            .map(
+              (item) => _HarnessTask.fromMap(
+                Map<String, dynamic>.from(item),
+              ),
+            )
+            .toList();
   }
 
   @override
@@ -40,9 +40,11 @@ final class FileTaskStore implements TaskStore {
 
     final dataList = tasks.map((t) => _HarnessTask(t).toMap()).toList();
 
-    final yamlString = YamlWriter(allowUnquotedStrings: true).write(dataList);
-
-    await _file.writeAsString(yamlString);
+    await _file.writeAsString(
+      YamlWriter(
+        allowUnquotedStrings: true,
+      ).write(dataList),
+    );
   }
 
   Future<void> _createSaveDirIfNeeded(File file) async {
