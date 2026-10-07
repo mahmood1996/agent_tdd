@@ -54,6 +54,35 @@ void main() {
         );
       },
     );
+
+    test(
+      'reset deletes the state file and subsequent savedState returns empty',
+      () async {
+        final store = FileStateStore(tempDir.path, 'state.json');
+        final originalState = FakeHarnessState(
+          phase: 'GREEN',
+          editablePatterns: ['lib/src/foo.dart'],
+          readOnlyPatterns: ['test/foo_test.dart'],
+          nextCommand: 'agent-tdd complete',
+          extra: {'key': 'value'},
+        );
+
+        await store.saveState(originalState);
+        await store.reset();
+
+        final state = await store.savedState();
+        expect(
+          state,
+          isHarnessState(
+            phase: isEmpty,
+            editablePatterns: isEmpty,
+            readOnlyPatterns: isEmpty,
+            nextCommand: isNull,
+            extra: isEmpty,
+          ),
+        );
+      },
+    );
   });
 }
 

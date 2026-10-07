@@ -40,6 +40,13 @@ final class FileStateStore implements StateStore {
     await _file.writeAsString(jsonString);
   }
 
+  @override
+  Future<void> reset() async {
+    if (await _file.exists()) {
+      await _file.delete();
+    }
+  }
+
   Future<void> _createSaveDirIfNeeded(File file) async {
     if (await file.parent.exists()) return;
 

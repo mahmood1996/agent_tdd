@@ -7,4 +7,7 @@ abstract interface class StateStore {
 
   /// Saves persistent harness state
   Future<void> saveState(HarnessState state);
+
+  /// Resets persistent harness state to default
+  Future<void> reset();
 }
