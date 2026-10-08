@@ -8,9 +8,7 @@ environment:
   sdk: ^3.12.2
 
 # Add regular dependencies here.
-dependencies:
-  cactoos_dart: ^2.7.0+0
-  
+dependencies:  
   resource:
     path: ../resource
 
