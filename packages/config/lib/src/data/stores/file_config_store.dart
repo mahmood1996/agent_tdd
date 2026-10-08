@@ -1,7 +1,6 @@
-import 'dart:convert';
 import 'dart:io';
-import 'package:yaml/yaml.dart';
-import 'package:yaml_writer/yaml_writer.dart';
+
+import 'package:resource/resource.dart';
 
 import '../../domain/models/readable_config.dart';
 import '../../domain/models/serializable_config.dart';
@@ -11,27 +10,26 @@ import '../models/json_config.dart';
 /// A [ConfigStore] implementation that reads from and writes to a YAML file.
 final class FileConfigStore implements ConfigStore {
   /// Public constructor taking a file path string.
-  FileConfigStore(String path) : this._(File(path));
+  FileConfigStore(String path) : this._(YamlResource(File(path)));
 
-  /// Private constructor wrapping a [File].
-  FileConfigStore._(this._file);
+  /// Private constructor wrapping a [Resource].
+  FileConfigStore._(this._resource);
 
-  final File _file;
+  final Resource<dynamic> _resource;
 
   @override
   Future<ReadableConfig> config() async {
-    return !await _file.exists()
-        ? ReadableConfig.empty
-        : switch ((await _file.readAsString()).trim()) {
-            '' => ReadableConfig.empty,
-            final content => switch (loadYaml(content)) {
-              final Map result => JsonConfig(jsonEncode(result)),
-              _ => ReadableConfig.empty,
-            },
-          };
+    try {
+      return switch (await _resource.content()) {
+        final Map result => JsonConfig(Map<String, dynamic>.from(result)),
+        _ => ReadableConfig.empty,
+      };
+    } on ResourceNotFoundException {
+      return ReadableConfig.empty;
+    }
   }
 
   @override
   Future<void> save(SerializableConfig conf) async =>
-      await _file.writeAsString(YamlWriter().write(conf.toMap()));
+      await _resource.save(conf.toMap());
 }

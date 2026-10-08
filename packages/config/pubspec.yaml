@@ -1,6 +1,7 @@
 name: config
 description: A starting point for Dart libraries or applications.
 version: 1.0.0
+publish_to: none
 # repository: https://github.com/my_org/my_repo
 
 environment:
@@ -9,9 +10,9 @@ environment:
 # Add regular dependencies here.
 dependencies:
   cactoos_dart: ^2.7.0+0
-  yaml: ^3.1.4
-  yaml_writer: ^2.1.0
-  # path: ^1.9.0
+  
+  resource:
+    path: ../resource
 
 dev_dependencies:
   lints: ^6.0.0
