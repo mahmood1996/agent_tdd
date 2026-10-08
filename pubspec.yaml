@@ -13,6 +13,8 @@ dependencies:
   crypto: ^3.0.3
   path: ^1.9.0
   glob: ^2.1.2
+  resource:
+    path: packages/resource
   agent_harness:
     path: packages/agent_harness
   agent_file_snapshot:

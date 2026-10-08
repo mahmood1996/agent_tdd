@@ -1,59 +1,40 @@
 import 'dart:io';
 import 'package:path/path.dart' as p;
-import 'package:yaml/yaml.dart';
-import 'package:yaml_writer/yaml_writer.dart';
+import 'package:resource/resource.dart';
 
 import 'models/spec.dart';
 import 'spec_store.dart';
 
 /// [SpecStore] implementation that persists [Spec] list to YAML files on disk.
 final class FileSpecStore implements SpecStore {
-  final String saveDir;
-  final String filePath;
+  FileSpecStore(String saveDir, String filePath)
+      : _resource = YamlResource(File(p.join(saveDir, filePath)));
 
-  FileSpecStore(this.saveDir, this.filePath);
+  final Resource<dynamic> _resource;
 
   @override
   Future<List<Spec>> specs() async {
     try {
       return await _tryGettingSavedSpecs();
-    } on FileSystemException {
+    } on ResourceNotFoundException {
       return [];
     }
   }
 
   Future<List<Spec>> _tryGettingSavedSpecs() async {
-    return !await _file.exists()
-        ? const <Spec>[]
-        : List.from(loadYaml(await _file.readAsString()) ?? const [])
-            .map(
-              (item) => _Spec.fromMap(
-                Map<String, dynamic>.from(item),
-              ),
-            )
-            .toList();
+    return List.from(await _resource.content() ?? [])
+        .map(
+          (item) => _Spec.fromMap(
+            Map<String, dynamic>.from(item),
+          ),
+        )
+        .toList();
   }
 
   @override
   Future<void> saveSpecs(List<Spec> specs) async {
-    await _createSaveDirIfNeeded(_file);
-
-    final dataList = specs.map((t) => _Spec(t).toMap()).toList();
-
-    await _file.writeAsString(
-      YamlWriter(
-        allowUnquotedStrings: true,
-      ).write(dataList),
-    );
+    await _resource.save(specs.map((t) => _Spec(t).toMap()).toList());
   }
-
-  Future<void> _createSaveDirIfNeeded(File file) async {
-    if (await file.parent.exists()) return;
-
-    await file.parent.create(recursive: true);
-  }
-
-  File get _file => File(p.join(saveDir, filePath));
 }
 
 /// Internal implementation of [Spec] for YAML serialization.

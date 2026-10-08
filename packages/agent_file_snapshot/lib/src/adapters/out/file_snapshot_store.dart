@@ -1,11 +1,11 @@
-import 'dart:convert';
 import 'dart:io';
+
+import 'package:resource/resource.dart';
 
 import '../../application/domain/models/file_snapshot.dart';
 import '../../application/ports/out/snapshot_store.dart';
 
-/// Concrete [SnapshotStore] that persists a [FileSnapshot] as a JSON file
-/// on the local file system.
+/// Concrete [SnapshotStore] that persists a [FileSnapshot] using a [Resource].
 ///
 /// The snapshot is serialised as a flat JSON object mapping relative file
 /// paths to their SHA-256 fingerprints, e.g.:
@@ -16,29 +16,36 @@ import '../../application/ports/out/snapshot_store.dart';
 /// }
 /// ```
 final class FileSnapshotStore implements SnapshotStore {
-  const FileSnapshotStore({required String path}) : _path = path;
+  FileSnapshotStore({required String path})
+      : _resource = JsonResource(File(path));
 
-  final String _path;
+  final Resource<dynamic> _resource;
 
   @override
   Future<FileSnapshot> savedSnapshot() async {
-    final file = File(_path);
-    if (!await file.exists()) return FileSnapshot(const {});
+    try {
+      return await _storedFileSnapshot();
+    } on ResourceNotFoundException {
+      return FileSnapshot(const {});
+    }
+  }
 
-    final raw = jsonDecode(await file.readAsString()) as Map<String, dynamic>;
-    return FileSnapshot(raw.cast<String, String>());
+  Future<FileSnapshot> _storedFileSnapshot() async {
+    return FileSnapshot(
+      switch (await _resource.content()) {
+        Map content => content.cast<String, String>(),
+        null || _ => const {},
+      },
+    );
   }
 
   @override
   Future<void> save(FileSnapshot snapshot) async {
-    final file = File(_path);
-    await file.parent.create(recursive: true);
-    await file.writeAsString(jsonEncode(FingerPrints(snapshot)));
+    await _resource.save(FingerPrints(snapshot));
   }
 
   @override
   Future<void> delete() async {
-    final file = File(_path);
-    if (await file.exists()) await file.delete();
+    await _resource.delete();
   }
 }
