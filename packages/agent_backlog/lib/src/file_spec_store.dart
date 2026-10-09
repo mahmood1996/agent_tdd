@@ -1,8 +1,10 @@
 import 'dart:io';
+
 import 'package:path/path.dart' as p;
 import 'package:resource/resource.dart';
 
 import 'models/spec.dart';
+
 import 'spec_store.dart';
 
 /// [SpecStore] implementation that persists [Spec] list to YAML files on disk.
@@ -32,10 +34,37 @@ final class FileSpecStore implements SpecStore {
   }
 
   @override
-  Future<void> saveSpecs(List<Spec> specs) async {
-    await _resource.save(specs.map((t) => _Spec(t).toMap()).toList());
+  Future<void> addSpec(String title, String description) async {
+    final currentSpecs = await specs();
+
+    final newId = currentSpecs.isEmpty
+        ? 1
+        : currentSpecs.map((s) => s.id).reduce((a, b) => a > b ? a : b) + 1;
+
+    await _resource.save(
+      currentSpecs.map((t) => _Spec(t).toMap()).toList()
+        ..add({
+          'id': newId,
+          'title': title,
+          'description': description,
+          'status': 'pending',
+          'metadata': {},
+        }),
+    );
+  }
+
+  @override
+  Future<void> updateSpecStatus(int specId, String newStatus) async {
+    await _resource.save(
+      (await specs())
+          .map((s) => s.id == specId ? s.copyWith(status: newStatus) : s)
+          .toList()
+          .map((t) => _Spec(t).toMap())
+          .toList(),
+    );
   }
 }
+
 
 /// Internal implementation of [Spec] for YAML serialization.
 final class _Spec implements Spec {

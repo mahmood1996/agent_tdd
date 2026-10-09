@@ -3,8 +3,7 @@ import 'dart:io';
 import 'package:agent_backlog/agent_backlog.dart';
 import 'package:test/test.dart';
 
-import 'fakes/fake_spec.dart';
-import 'matchers/spec_matchers.dart';
+
 
 void main() {
   group('FileSpecStore Tests', () {
@@ -20,43 +19,26 @@ void main() {
       }
     });
 
-    test('specs retrieves specs saved by saveSpecs', () async {
+    test('specs retrieves specs saved by addSpec', () async {
       final store = FileSpecStore(tempDir.path, 'specs.yaml');
-      final originalSpecs = [
-        const FakeSpec(
-          id: 1,
-          title: 'Spec 1',
-          description: 'desc 1',
-          status: 'pending',
-          metadata: {'meta': 'val'},
-        ),
-        const FakeSpec(
-          id: 2,
-          title: 'Spec 2',
-          description: 'desc 2',
-          status: 'done',
-        ),
-      ];
 
-      await store.saveSpecs(originalSpecs);
+      await store.addSpec('Spec 1', 'desc 1');
+      await store.addSpec('Spec 2', 'desc 2');
+
       final retrievedSpecs = await store.specs();
 
       expect(retrievedSpecs.length, equals(2));
-      expect(retrievedSpecs[0], equalsSpec(originalSpecs[0]));
-      expect(retrievedSpecs[1], equalsSpec(originalSpecs[1]));
+      expect(retrievedSpecs[0].id, equals(1));
+      expect(retrievedSpecs[0].title, equals('Spec 1'));
+      expect(retrievedSpecs[0].status, equals('pending'));
+      expect(retrievedSpecs[1].id, equals(2));
+      expect(retrievedSpecs[1].title, equals('Spec 2'));
+      expect(retrievedSpecs[1].status, equals('pending'));
     });
 
-    test('saveSpecs writes valid YAML to disk', () async {
+    test('addSpec writes valid YAML to disk', () async {
       final store = FileSpecStore(tempDir.path, 'specs.yaml');
-      await store.saveSpecs([
-        const FakeSpec(
-          id: 1,
-          title: 'Spec 1',
-          description: 'desc 1',
-          status: 'pending',
-          metadata: {},
-        ),
-      ]);
+      await store.addSpec('Spec 1', 'desc 1');
 
       final file = File('${tempDir.path}/specs.yaml');
       final content = await file.readAsString();
@@ -76,14 +58,21 @@ void main() {
       expect(specs, isEmpty);
     });
 
+    test('updateSpecStatus updates status correctly', () async {
+      final store = FileSpecStore(tempDir.path, 'specs.yaml');
+      await store.addSpec('Spec 1', 'desc 1');
+
+      await store.updateSpecStatus(1, 'done');
+      final specs = await store.specs();
+
+      expect(specs.length, equals(1));
+      expect(specs[0].status, equals('done'));
+    });
+
     test('FileSpecStore workflow with SmartSpecStore extension', () async {
       final store = FileSpecStore(tempDir.path, 'specs.yaml');
-      await store.saveSpecs([
-        const FakeSpec(
-            id: 1, title: 'Item 1', description: 'desc 1', status: 'pending'),
-        const FakeSpec(
-            id: 2, title: 'Item 2', description: 'desc 2', status: 'pending'),
-      ]);
+      await store.addSpec('Item 1', 'desc 1');
+      await store.addSpec('Item 2', 'desc 2');
 
       final next = await store.nextPendingSpec();
       expect(next?.id, equals(1));

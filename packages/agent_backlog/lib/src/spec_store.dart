@@ -7,8 +7,11 @@ abstract interface class SpecStore {
   /// Loads all specs from persistent storage
   Future<List<Spec>> specs();
 
-  /// Saves all specs to persistent storage
-  Future<void> saveSpecs(List<Spec> specs);
+  /// Adds a new spec to persistent storage
+  Future<void> addSpec(String title, String description);
+
+  /// Updates the status of a specific spec by ID and persists the change
+  Future<void> updateSpecStatus(int specId, String newStatus);
 }
 
 /// Extension providing high-level helper methods on top of [SpecStore]
@@ -21,19 +24,7 @@ extension SmartSpecStore on SpecStore {
   Future<void> markSpecDone(
     int specId,
   ) async =>
-      await saveSpecs(
-        (await specs())
-            .map((t) => t.id == specId ? t.markedAsDone() : t)
-            .toList(),
-      );
-
-  /// Updates the status of a specific spec by ID and persists the change
-  Future<void> updateSpecStatus(int specId, String status) async =>
-      await saveSpecs(
-        (await specs())
-            .map((t) => t.id == specId ? t.copyWith(status: status) : t)
-            .toList(),
-      );
+      await updateSpecStatus(specId, 'done');
 
   Future<Map<String, dynamic>> summary() async {
     final list = await specs();
