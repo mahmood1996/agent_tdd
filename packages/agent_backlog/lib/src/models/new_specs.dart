@@ -86,47 +86,25 @@ final class _ParsedLine {
   final String description;
   final Map<String, dynamic> metadata;
 
-  static final _pendingRe = RegExp(r'^[-*]\s+\[ \]\s+(.+)$');
-  static final _doneRe = RegExp(r'^[-*]\s+\[[xX]\]\s+(.+)$');
+  static final _prefixRe = RegExp(r'^[-*]\s+\[[ xX]\]\s*');
+  static final _doneRe = RegExp(r'^[-*]\s+\[[xX]\]');
 
-  factory _ParsedLine.from(String rawLine) {
-    final pending = _pendingRe.firstMatch(rawLine);
-    final done = _doneRe.firstMatch(rawLine);
-
-    final String body;
-    final String status;
-
-    if (pending != null) {
-      body = pending.group(1)!.trim();
-      status = 'pending';
-    } else if (done != null) {
-      body = done.group(1)!.trim();
-      status = 'done';
-    } else {
-      body = rawLine.trim();
-      status = 'pending';
-    }
-
-    final parts = body.split('|').map((p) => p.trim()).toList();
+  factory _ParsedLine.from(String raw) {
+    final clean = raw.trim().replaceFirst(_prefixRe, '');
+    final parts = clean.split('|').map((p) => p.trim()).toList();
 
     return _ParsedLine(
-      title: parts.isNotEmpty ? parts[0] : '',
-      status: status,
+      title: parts.first,
+      status: _doneRe.hasMatch(raw.trim()) ? 'done' : 'pending',
       description: parts.length > 1 ? parts[1] : '',
       metadata: parts.length > 2 ? _parseMetadata(parts[2]) : const {},
     );
   }
 
-  static Map<String, dynamic> _parseMetadata(String raw) {
-    if (raw.trim().isEmpty) return const {};
-    final result = <String, dynamic>{};
-    for (final token in raw.trim().split(RegExp(r'\s+'))) {
-      final colonIdx = token.indexOf(':');
-      if (colonIdx <= 0) continue;
-      final key = token.substring(0, colonIdx);
-      final value = token.substring(colonIdx + 1);
-      result[key] = value;
-    }
-    return result.isEmpty ? const {} : Map.unmodifiable(result);
-  }
+  static Map<String, dynamic> _parseMetadata(
+    String raw,
+  ) =>
+      Map.unmodifiable({
+        for (final m in RegExp(r'(\S+?):(\S+)').allMatches(raw)) m[1]!: m[2]!,
+      });
 }
