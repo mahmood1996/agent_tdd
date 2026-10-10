@@ -84,7 +84,8 @@ void main() {
       expect(spec.description, equals('Some description'));
     });
 
-    test('addSpecs parses metadata key:value pairs from markdown line', () async {
+    test('addSpecs parses metadata key:value pairs from markdown line',
+        () async {
       await store.addSpecs(NewSpecs.fromMarkdown(
         '- [ ] My spec | Some description | priority:high tag:unit',
       ));
@@ -141,6 +142,19 @@ Some intro text.
       expect(specs.length, equals(2));
       expect(specs[0].title, equals('Real spec 1'));
       expect(specs[1].title, equals('Real spec 2'));
+    });
+
+    test('adding a Spec with title and description', () async {
+      await store.addSpec(
+        'fizzBuzzFor(5) returns "Buzz"',
+        'Returning "Buzz" when input is 5',
+      );
+
+      final spec = (await store.specs()).first;
+
+      expect(spec.isPending, isTrue);
+      expect(spec.title, 'fizzBuzzFor(5) returns "Buzz"');
+      expect(spec.description, 'Returning "Buzz" when input is 5');
     });
   });
 }
