@@ -41,11 +41,11 @@ extension SmartSpecStore on SpecStore {
       'total': total,
       'completed': completed,
       'percentage': percentage,
-      'active_spec': (await _activeSpec())?.toJson(),
+      'active_spec': (await activeSpec())?.toJson(),
       'specs': list.map((s) => s.toJson()).toList(),
     };
   }
 
-  Future<Spec?> _activeSpec() async =>
+  Future<Spec?> activeSpec() async =>
       (await specs()).where((t) => !t.isDone).firstOrNull;
 }
