@@ -1,14 +1,10 @@
-/// Abstract interface contract representing a task or feature spec item in a backlog
-abstract interface class Spec {
+import 'new_spec.dart';
+
+/// Abstract interface contract representing a persisted spec item in a backlog.
+///
+/// Extends [NewSpec] with an auto-assigned [id] from storage.
+abstract interface class Spec implements NewSpec {
   int get id;
-
-  String get title;
-
-  String get description;
-
-  String get status;
-
-  Map<String, dynamic> get metadata;
 }
 
 extension SmartSpec on Spec {

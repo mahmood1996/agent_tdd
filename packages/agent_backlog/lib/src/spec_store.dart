@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'models/new_spec.dart';
 import 'models/spec.dart';
 
 /// Abstract interface for spec backlog storage and retrieval
@@ -7,8 +8,8 @@ abstract interface class SpecStore {
   /// Loads all specs from persistent storage
   Future<List<Spec>> specs();
 
-  /// Adds a new spec to persistent storage
-  Future<void> addSpec(String title, String description);
+  /// Adds one or more new specs to persistent storage in a single write
+  Future<void> addSpecs(Iterable<NewSpec> specs);
 
   /// Updates the status of a specific spec by ID and persists the change
   Future<void> updateSpecStatus(int specId, String newStatus);

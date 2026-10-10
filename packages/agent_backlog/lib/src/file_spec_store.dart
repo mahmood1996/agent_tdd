@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:resource/resource.dart';
 
+import 'models/new_spec.dart';
 import 'models/spec.dart';
 
 import 'spec_store.dart';
@@ -34,23 +35,19 @@ final class FileSpecStore implements SpecStore {
   }
 
   @override
-  Future<void> addSpec(String title, String description) async {
-    final currentSpecs = await specs();
+  Future<void> addSpecs(Iterable<NewSpec> specs) async {
+    final incoming = specs.toList();
+    if (incoming.isEmpty) return;
 
-    final newId = currentSpecs.isEmpty
+    final currentSpecs = await this.specs();
+    var nextId = currentSpecs.isEmpty
         ? 1
         : currentSpecs.map((s) => s.id).reduce((a, b) => a > b ? a : b) + 1;
 
-    await _resource.save(
-      currentSpecs.map((t) => _Spec(t).toMap()).toList()
-        ..add({
-          'id': newId,
-          'title': title,
-          'description': description,
-          'status': 'pending',
-          'metadata': {},
-        }),
-    );
+    await _resource.save([
+      ...currentSpecs.map((t) => _Spec(t).toMap()),
+      ...incoming.map((spec) => _Spec.fromNewSpec(spec, nextId++).toMap()),
+    ]);
   }
 
   @override
@@ -65,11 +62,17 @@ final class FileSpecStore implements SpecStore {
   }
 }
 
-
 /// Internal implementation of [Spec] for YAML serialization.
 final class _Spec implements Spec {
   _Spec(Spec spec)
       : id = spec.id,
+        title = spec.title,
+        status = spec.status,
+        description = spec.description,
+        metadata = Map<String, dynamic>.unmodifiable(spec.metadata);
+
+  _Spec.fromNewSpec(NewSpec spec, int newId)
+      : id = newId,
         title = spec.title,
         status = spec.status,
         description = spec.description,
