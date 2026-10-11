@@ -1,8 +1,8 @@
+import 'package:agent_backlog/agent_backlog.dart';
 import 'package:agent_file_snapshot/agent_file_snapshot.dart';
 import 'package:path/path.dart' as p;
 
 import '../../../core/data/config_store.dart';
-import '../../../core/data/spec_store.dart';
 import '../../../core/data/tdd_cycle.dart';
 import '../../../core/domain/tdd_config.dart';
 import '../../../core/domain/tdd_constants.dart';
@@ -44,7 +44,7 @@ final class VerifyGreenUseCase {
     IntegrityViolations? integrityViolations,
     GitClient? gitClient,
   })  : configStore = configStore ?? ConfigStore(projectDir: projectDir),
-        specStore = specStore ?? SpecStore(projectDir: projectDir),
+        specStore = specStore ?? FileSpecStore(projectDir, 'specs.yaml'),
         tddCycle = tddCycle ?? TddCycle(projectDir: projectDir),
         integrityViolations = integrityViolations ??
             IntegrityViolations(

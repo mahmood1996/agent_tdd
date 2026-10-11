@@ -1,5 +1,5 @@
-import '../../core/data/spec_store.dart';
 import '../../core/data/tdd_cycle.dart';
+import 'package:tdd_spec_store/tdd_spec_store.dart';
 import '../../features/specs/usecases/add_spec_usecase.dart';
 import '../../features/specs/usecases/import_specs_usecase.dart';
 import '../../features/specs/usecases/list_specs_usecase.dart';
@@ -7,7 +7,7 @@ import '../presenter/specs_presenter.dart';
 
 final class SpecsCommand {
   final String projectDir;
-  final SpecStore specStore;
+  final TddSpecStore specStore;
   final TddCycle tddCycle;
   final SpecsPresenter presenter;
 

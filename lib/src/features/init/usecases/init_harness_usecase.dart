@@ -1,7 +1,8 @@
+import 'package:agent_backlog/agent_backlog.dart';
+
 import '../../../core/data/config_store.dart';
-import '../../../core/services/config_detection.dart';
-import '../../../core/data/spec_store.dart';
 import '../../../core/domain/tdd_config.dart';
+import '../../../core/services/config_detection.dart';
 
 final class InitHarnessResult {
   final bool success;
@@ -32,7 +33,7 @@ final class InitHarnessUseCase {
     ConfigStore? configStore,
     ConfigDetection? configDetection,
   })  : configStore = configStore ?? ConfigStore(projectDir: projectDir),
-        specStore = specStore ?? SpecStore(projectDir: projectDir),
+        specStore = specStore ?? FileSpecStore(projectDir, 'specs.yaml'),
         configDetection = configDetection ?? ConfigDetection();
 
   Future<InitHarnessResult> execute({String? runnerPreset}) async {

@@ -1,6 +1,6 @@
 import '../../core/data/config_store.dart';
-import '../../core/data/spec_store.dart';
 import '../../core/data/tdd_cycle.dart';
+import 'package:tdd_spec_store/tdd_spec_store.dart';
 import '../../core/domain/tdd_state.dart';
 import '../../core/services/analyzer.dart';
 import '../../core/services/git_client.dart';
@@ -14,7 +14,7 @@ import '../presenter/verification_presenter.dart';
 final class VerificationCommands {
   final String projectDir;
   final ConfigStore configStore;
-  final SpecStore specStore;
+  final TddSpecStore specStore;
   final TddCycle tddCycle;
   final TestRunVerifications testRunVerifications;
   final Analyzer analyzer;

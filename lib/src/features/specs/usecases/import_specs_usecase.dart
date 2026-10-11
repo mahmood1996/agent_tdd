@@ -1,4 +1,6 @@
-import '../../../core/data/spec_store.dart';
+import 'dart:io';
+
+import 'package:agent_backlog/agent_backlog.dart';
 
 final class ImportSpecsResult {
   final String filePath;
@@ -13,10 +15,16 @@ final class ImportSpecsUseCase {
   ImportSpecsUseCase({
     required this.projectDir,
     SpecStore? specStore,
-  }) : specStore = specStore ?? SpecStore(projectDir: projectDir);
+  }) : specStore = specStore ?? FileSpecStore(projectDir, 'specs.yaml');
 
   Future<ImportSpecsResult> execute(String filePath) async {
-    await specStore.importSpecsFrom(filePath);
+    final file = File(filePath);
+    if (!await file.exists()) {
+      throw Exception('Markdown file not found: $filePath');
+    }
+
+    final content = await file.readAsString();
+    await specStore.addSpecs(NewSpecs.fromMarkdown(content));
     return ImportSpecsResult(filePath: filePath);
   }
 }

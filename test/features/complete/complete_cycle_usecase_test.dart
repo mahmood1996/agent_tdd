@@ -35,7 +35,7 @@ void main() {
     test(
         'execute completes active spec, deletes snapshot, resets cycle to IDLE, and commits git',
         () async {
-      final specStore = SpecStore(projectDir: harness.tempDir.path);
+      final specStore = TddSpecStore.file(harness.tempDir.path);
       await specStore.addSpec('Spec 1');
       await specStore.updateSpecStatus(1, 'refactor');
 
@@ -85,7 +85,7 @@ void main() {
 
     test('execute completes active spec when phase is TddPhase.alreadyPassed',
         () async {
-      final specStore = SpecStore(projectDir: harness.tempDir.path);
+      final specStore = TddSpecStore.file(harness.tempDir.path);
       await specStore.addSpec('Spec 1');
       await specStore.updateSpecStatus(1, 'already_passed');
 

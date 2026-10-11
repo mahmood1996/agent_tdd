@@ -19,7 +19,7 @@ void main() {
     test(
         'execute succeeds, picks next pending spec, and transitions to RED phase',
         () async {
-      final specStore = SpecStore(projectDir: harness.tempDir.path);
+      final specStore = TddSpecStore.file(harness.tempDir.path);
       await specStore.addSpec('Build User Profile');
 
       final useCase = StartNextCycleUseCase(projectDir: harness.tempDir.path);
@@ -32,7 +32,7 @@ void main() {
     });
 
     test('execute fails if cycle is already in progress', () async {
-      final specStore = SpecStore(projectDir: harness.tempDir.path);
+      final specStore = TddSpecStore.file(harness.tempDir.path);
       await specStore.addSpec('Spec 1');
       await specStore.addSpec('Spec 2');
 

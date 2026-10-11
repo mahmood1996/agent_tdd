@@ -1,12 +1,13 @@
-import '../../../core/data/spec_store.dart';
+import 'package:agent_backlog/agent_backlog.dart';
+
 import '../../../core/data/tdd_cycle.dart';
-import '../../../core/domain/spec_item.dart';
+import 'package:tdd_spec_store/tdd_spec_store.dart';
 import '../../../core/domain/tdd_state.dart';
 
 final class ListSpecsResult {
   final TddState currentState;
   final Map<String, dynamic> summary;
-  final List<SpecItem> specs;
+  final List<Spec> specs;
 
   const ListSpecsResult({
     required this.currentState,
@@ -17,14 +18,14 @@ final class ListSpecsResult {
 
 final class ListSpecsUseCase {
   final String projectDir;
-  final SpecStore specStore;
+  final TddSpecStore specStore;
   final TddCycle tddCycle;
 
   ListSpecsUseCase({
     required this.projectDir,
-    SpecStore? specStore,
+    TddSpecStore? specStore,
     TddCycle? tddCycle,
-  })  : specStore = specStore ?? SpecStore(projectDir: projectDir),
+  })  : specStore = specStore ?? TddSpecStore.file(projectDir),
         tddCycle = tddCycle ?? TddCycle(projectDir: projectDir);
 
   Future<ListSpecsResult> execute() async {

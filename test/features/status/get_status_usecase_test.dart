@@ -18,7 +18,7 @@ void main() {
 
     test('execute returns active phase, bound active spec, and backlog summary',
         () async {
-      final specStore = SpecStore(projectDir: harness.tempDir.path);
+      final specStore = TddSpecStore.file(harness.tempDir.path);
       await specStore.addSpec('Spec 1');
       await specStore.updateSpecStatus(1, 'red');
 

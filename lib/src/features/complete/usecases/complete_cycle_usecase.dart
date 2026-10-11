@@ -2,8 +2,8 @@ import 'package:agent_file_snapshot/agent_file_snapshot.dart';
 import 'package:path/path.dart' as p;
 
 import '../../../core/data/config_store.dart';
-import '../../../core/data/spec_store.dart';
 import '../../../core/data/tdd_cycle.dart';
+import 'package:tdd_spec_store/tdd_spec_store.dart';
 import '../../../core/domain/tdd_constants.dart';
 import '../../../core/domain/tdd_state.dart';
 import '../../../core/services/git_client.dart';
@@ -29,7 +29,7 @@ final class CompleteCycleResult {
 final class CompleteCycleUseCase {
   final String projectDir;
   final ConfigStore configStore;
-  final SpecStore specStore;
+  final TddSpecStore specStore;
   final TddCycle tddCycle;
   final DeleteSnapshot deleteSnapshot;
   final GitClient gitClient;
@@ -37,12 +37,12 @@ final class CompleteCycleUseCase {
   CompleteCycleUseCase({
     required this.projectDir,
     ConfigStore? configStore,
-    SpecStore? specStore,
+    TddSpecStore? specStore,
     TddCycle? tddCycle,
     GitClient? gitClient,
     DeleteSnapshot? deleteSnapshot,
   })  : configStore = configStore ?? ConfigStore(projectDir: projectDir),
-        specStore = specStore ?? SpecStore(projectDir: projectDir),
+        specStore = specStore ?? TddSpecStore.file(projectDir),
         tddCycle = tddCycle ?? TddCycle(projectDir: projectDir),
         gitClient = gitClient ?? GitClient(projectDir: projectDir),
         deleteSnapshot = deleteSnapshot ??

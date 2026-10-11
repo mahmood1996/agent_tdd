@@ -31,21 +31,4 @@ extension SmartSpecStore on SpecStore {
   ) async =>
       await updateSpecStatus(specId, 'done');
 
-  Future<Map<String, dynamic>> summary() async {
-    final list = await specs();
-    final total = list.length;
-    final completed = list.where((s) => s.isDone).length;
-    final percentage = total == 0 ? 0 : ((completed / total) * 100).round();
-
-    return {
-      'total': total,
-      'completed': completed,
-      'percentage': percentage,
-      'active_spec': (await activeSpec())?.toJson(),
-      'specs': list.map((s) => s.toJson()).toList(),
-    };
-  }
-
-  Future<Spec?> activeSpec() async =>
-      (await specs()).where((t) => !t.isDone).firstOrNull;
 }

@@ -1,6 +1,6 @@
 import '../../../core/data/config_store.dart';
-import '../../../core/data/spec_store.dart';
 import '../../../core/data/tdd_cycle.dart';
+import 'package:tdd_spec_store/tdd_spec_store.dart';
 import '../../../core/domain/tdd_config.dart';
 import '../../../core/domain/tdd_state.dart';
 
@@ -19,16 +19,16 @@ final class GetStatusResult {
 final class GetStatusUseCase {
   final String projectDir;
   final ConfigStore configStore;
-  final SpecStore specStore;
+  final TddSpecStore specStore;
   final TddCycle tddCycle;
 
   GetStatusUseCase({
     required this.projectDir,
     ConfigStore? configStore,
-    SpecStore? specStore,
+    TddSpecStore? specStore,
     TddCycle? tddCycle,
   })  : configStore = configStore ?? ConfigStore(projectDir: projectDir),
-        specStore = specStore ?? SpecStore(projectDir: projectDir),
+        specStore = specStore ?? TddSpecStore.file(projectDir),
         tddCycle = tddCycle ?? TddCycle(projectDir: projectDir);
 
   Future<GetStatusResult> execute() async {

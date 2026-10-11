@@ -25,6 +25,8 @@ dependencies:
     path: packages/usecase
   config:
     path: packages/config
+  tdd_spec_store:
+    path: packages/tdd_spec_store
 
 dev_dependencies:
   test: ^1.25.0

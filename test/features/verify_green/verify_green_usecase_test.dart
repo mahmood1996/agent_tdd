@@ -154,7 +154,7 @@ void main() {
       );
       await captureSnapshot('test/**/*.dart');
 
-      final specStore = SpecStore(projectDir: harness.tempDir.path);
+      final specStore = TddSpecStore.file(harness.tempDir.path);
       await specStore.addSpec('Spec 1');
 
       final cycle = TddCycle(projectDir: harness.tempDir.path);

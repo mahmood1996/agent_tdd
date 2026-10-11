@@ -1,6 +1,6 @@
 import '../core/data/config_store.dart';
-import '../core/data/spec_store.dart';
 import '../core/data/tdd_cycle.dart';
+import 'package:tdd_spec_store/tdd_spec_store.dart';
 import '../core/services/analyzer.dart';
 import '../core/services/git_client.dart';
 import '../core/services/test_run_verifications.dart';
@@ -17,7 +17,7 @@ import 'presenter/verification_presenter.dart';
 final class CliRunner {
   final String projectDir;
   final ConfigStore configStore;
-  final SpecStore specStore;
+  final TddSpecStore specStore;
   final TddCycle tddCycle;
   final TestRunVerifications testRunVerifications;
   final Analyzer analyzer;
@@ -32,7 +32,7 @@ final class CliRunner {
   CliRunner({
     required this.projectDir,
     ConfigStore? configStore,
-    SpecStore? specStore,
+    TddSpecStore? specStore,
     TddCycle? tddCycle,
     TestRunVerifications? testRunVerifications,
     Analyzer? analyzer,
@@ -43,7 +43,7 @@ final class CliRunner {
     LifecyclePresenter lifecyclePresenter = const LifecyclePresenter(),
     FallbackPresenter fallbackPresenter = const FallbackPresenter(),
   })  : configStore = configStore ?? ConfigStore(projectDir: projectDir),
-        specStore = specStore ?? SpecStore(projectDir: projectDir),
+        specStore = specStore ?? TddSpecStore.file(projectDir),
         tddCycle = tddCycle ?? TddCycle(projectDir: projectDir),
         testRunVerifications = testRunVerifications ??
             TestRunVerifications(projectDir, configStore: configStore),
@@ -54,19 +54,19 @@ final class CliRunner {
         _initCommand = InitCommand(
           projectDir: projectDir,
           configStore: configStore ?? ConfigStore(projectDir: projectDir),
-          specStore: specStore ?? SpecStore(projectDir: projectDir),
+          specStore: specStore ?? TddSpecStore.file(projectDir),
           presenter: initPresenter,
         ),
         _specsCommand = SpecsCommand(
           projectDir: projectDir,
-          specStore: specStore ?? SpecStore(projectDir: projectDir),
+          specStore: specStore ?? TddSpecStore.file(projectDir),
           tddCycle: tddCycle ?? TddCycle(projectDir: projectDir),
           presenter: specsPresenter,
         ),
         _verificationCommands = VerificationCommands(
           projectDir: projectDir,
           configStore: configStore ?? ConfigStore(projectDir: projectDir),
-          specStore: specStore ?? SpecStore(projectDir: projectDir),
+          specStore: specStore ?? TddSpecStore.file(projectDir),
           tddCycle: tddCycle ?? TddCycle(projectDir: projectDir),
           testRunVerifications: testRunVerifications ??
               TestRunVerifications(projectDir, configStore: configStore),
@@ -78,7 +78,7 @@ final class CliRunner {
         _lifecycleCommands = LifecycleCommands(
           projectDir: projectDir,
           configStore: configStore ?? ConfigStore(projectDir: projectDir),
-          specStore: specStore ?? SpecStore(projectDir: projectDir),
+          specStore: specStore ?? TddSpecStore.file(projectDir),
           tddCycle: tddCycle ?? TddCycle(projectDir: projectDir),
           gitClient: gitClient ?? GitClient(projectDir: projectDir),
           presenter: lifecyclePresenter,

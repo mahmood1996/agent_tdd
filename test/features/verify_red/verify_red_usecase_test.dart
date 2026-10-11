@@ -62,7 +62,7 @@ void main() {
     test(
         'execute transitions to alreadyPassed phase when tests pass during RED phase',
         () async {
-      final specStore = SpecStore(projectDir: harness.tempDir.path);
+      final specStore = TddSpecStore.file(harness.tempDir.path);
       await specStore.addSpec('Spec 1');
       final cycle = TddCycle(projectDir: harness.tempDir.path);
       await cycle.save(TddState(
@@ -111,7 +111,7 @@ void main() {
       harness.createFile(
           'test/sample_test.dart', 'void main() { throw Exception("fail"); }');
 
-      final specStore = SpecStore(projectDir: harness.tempDir.path);
+      final specStore = TddSpecStore.file(harness.tempDir.path);
       await specStore.addSpec('Spec 1');
       final cycle = TddCycle(projectDir: harness.tempDir.path);
       await cycle.save(TddState(

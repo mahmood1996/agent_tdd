@@ -1,6 +1,6 @@
 import '../../core/data/config_store.dart';
-import '../../core/data/spec_store.dart';
 import '../../core/data/tdd_cycle.dart';
+import 'package:tdd_spec_store/tdd_spec_store.dart';
 import '../../core/services/git_client.dart';
 import '../../features/complete/usecases/complete_cycle_usecase.dart';
 import '../../features/next/usecases/start_next_cycle_usecase.dart';
@@ -11,7 +11,7 @@ import '../presenter/lifecycle_presenter.dart';
 final class LifecycleCommands {
   final String projectDir;
   final ConfigStore configStore;
-  final SpecStore specStore;
+  final TddSpecStore specStore;
   final TddCycle tddCycle;
   final GitClient gitClient;
   final LifecyclePresenter presenter;

@@ -1,14 +1,14 @@
+import 'package:agent_backlog/agent_backlog.dart';
+
 import '../../../core/data/config_store.dart';
-import '../../../core/data/spec_store.dart';
 import '../../../core/data/tdd_cycle.dart';
-import '../../../core/domain/spec_item.dart';
 import '../../../core/domain/tdd_config.dart';
 import '../../../core/domain/tdd_state.dart';
 
 final class StartNextCycleResult {
   final bool success;
   final TddState currentState;
-  final SpecItem? activeSpec;
+  final Spec? activeSpec;
   final TddConfig? config;
   final String message;
 
@@ -33,7 +33,7 @@ final class StartNextCycleUseCase {
     SpecStore? specStore,
     TddCycle? tddCycle,
   })  : configStore = configStore ?? ConfigStore(projectDir: projectDir),
-        specStore = specStore ?? SpecStore(projectDir: projectDir),
+        specStore = specStore ?? FileSpecStore(projectDir, 'specs.yaml'),
         tddCycle = tddCycle ?? TddCycle(projectDir: projectDir);
 
   Future<StartNextCycleResult> execute() async {

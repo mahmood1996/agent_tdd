@@ -20,7 +20,7 @@ void main() {
 
       expect(res.filePath, equals(mdFile.path));
 
-      final specStore = SpecStore(projectDir: harness.tempDir.path);
+      final specStore = TddSpecStore.file(harness.tempDir.path);
       final importedSpecs = await specStore.specs();
       expect(importedSpecs.length, equals(2));
       expect(importedSpecs[0].title, equals('Task 1: Setup database'));
