@@ -4,6 +4,7 @@ import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 
 import '../../helpers/base_test_harness.dart';
+import '../../helpers/fake_spec.dart';
 
 class MockTestRunVerifications extends TestRunVerifications {
   TestRunVerification mockVerification;
@@ -76,14 +77,10 @@ void main() {
       );
       await captureSnapshot('test/**/*_test.dart');
 
-      final cycle = TddCycle(projectDir: harness.tempDir.path);
-      await cycle.save(TddState(
-        phase: TddPhase.green,
-        activeSpecId: 1,
-        activeSpecTitle: 'Spec 1',
-        startedAt: DateTime.now(),
-        lastUpdated: DateTime.now(),
-      ));
+      final store = TddStateStore(projectDir: harness.tempDir.path);
+      await store.save(
+        TddState.green(const FakeSpec(id: 1, title: 'Spec 1')),
+      );
 
       testFile.writeAsStringSync('void main() { print("modified!"); }');
 
@@ -107,14 +104,10 @@ void main() {
       );
       await captureSnapshot('test/**/*.dart');
 
-      final cycle = TddCycle(projectDir: harness.tempDir.path);
-      await cycle.save(TddState(
-        phase: TddPhase.green,
-        activeSpecId: 1,
-        activeSpecTitle: 'Spec 1',
-        startedAt: DateTime.now(),
-        lastUpdated: DateTime.now(),
-      ));
+      final store = TddStateStore(projectDir: harness.tempDir.path);
+      await store.save(
+        TddState.green(const FakeSpec(id: 1, title: 'Spec 1')),
+      );
 
       final mockRunner = MockTestRunVerifications(
         projectDir: harness.tempDir.path,
@@ -156,15 +149,10 @@ void main() {
 
       final specStore = TddSpecStore.file(harness.tempDir.path);
       await specStore.addSpec('Spec 1');
+      final spec = (await specStore.specs()).first;
 
-      final cycle = TddCycle(projectDir: harness.tempDir.path);
-      await cycle.save(TddState(
-        phase: TddPhase.green,
-        activeSpecId: 1,
-        activeSpecTitle: 'Spec 1',
-        startedAt: DateTime.now(),
-        lastUpdated: DateTime.now(),
-      ));
+      final store = TddStateStore(projectDir: harness.tempDir.path);
+      await store.save(TddState.green(spec));
 
       final mockRunner = MockTestRunVerifications(
         projectDir: harness.tempDir.path,

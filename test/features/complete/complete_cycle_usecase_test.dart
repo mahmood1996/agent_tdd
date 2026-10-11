@@ -38,15 +38,10 @@ void main() {
       final specStore = TddSpecStore.file(harness.tempDir.path);
       await specStore.addSpec('Spec 1');
       await specStore.updateSpecStatus(1, 'refactor');
+      final spec = (await specStore.specs()).first;
 
-      final cycle = TddCycle(projectDir: harness.tempDir.path);
-      await cycle.save(TddState(
-        phase: TddPhase.refactor,
-        activeSpecId: 1,
-        activeSpecTitle: 'Spec 1',
-        startedAt: DateTime.now(),
-        lastUpdated: DateTime.now(),
-      ));
+      final store = TddStateStore(projectDir: harness.tempDir.path);
+      await store.save(TddState.refactor(spec));
 
       final captureSnapshot = CaptureSnapshot(
         baseDir: harness.tempDir.path,
@@ -88,15 +83,10 @@ void main() {
       final specStore = TddSpecStore.file(harness.tempDir.path);
       await specStore.addSpec('Spec 1');
       await specStore.updateSpecStatus(1, 'already_passed');
+      final spec = (await specStore.specs()).first;
 
-      final cycle = TddCycle(projectDir: harness.tempDir.path);
-      await cycle.save(TddState(
-        phase: TddPhase.alreadyPassed,
-        activeSpecId: 1,
-        activeSpecTitle: 'Spec 1',
-        startedAt: DateTime.now(),
-        lastUpdated: DateTime.now(),
-      ));
+      final store = TddStateStore(projectDir: harness.tempDir.path);
+      await store.save(TddState.alreadyPassed(spec));
 
       final mockGit = MockGitClient(projectDir: harness.tempDir.path);
 

@@ -3,7 +3,7 @@ import 'package:agent_file_snapshot/agent_file_snapshot.dart';
 import 'package:path/path.dart' as p;
 
 import '../../../core/data/config_store.dart';
-import '../../../core/data/tdd_cycle.dart';
+import '../../../core/data/tdd_state_store.dart';
 import '../../../core/domain/tdd_config.dart';
 import '../../../core/domain/tdd_constants.dart';
 import '../../../core/domain/tdd_state.dart';
@@ -30,7 +30,7 @@ final class VerifyGreenUseCase {
   final String projectDir;
   final ConfigStore configStore;
   final SpecStore specStore;
-  final TddCycle tddCycle;
+  final TddStateStore stateStore;
   final GitClient gitClient;
   final TestRunVerifications testRunVerifications;
   final IntegrityViolations integrityViolations;
@@ -39,13 +39,13 @@ final class VerifyGreenUseCase {
     required this.projectDir,
     ConfigStore? configStore,
     SpecStore? specStore,
-    TddCycle? tddCycle,
+    TddStateStore? stateStore,
     TestRunVerifications? testRunVerifications,
     IntegrityViolations? integrityViolations,
     GitClient? gitClient,
   })  : configStore = configStore ?? ConfigStore(projectDir: projectDir),
         specStore = specStore ?? FileSpecStore(projectDir, 'specs.yaml'),
-        tddCycle = tddCycle ?? TddCycle(projectDir: projectDir),
+        stateStore = stateStore ?? TddStateStore(projectDir: projectDir),
         integrityViolations = integrityViolations ??
             IntegrityViolations(
               baseDir: projectDir,
@@ -56,7 +56,7 @@ final class VerifyGreenUseCase {
         gitClient = gitClient ?? GitClient(projectDir: projectDir);
 
   Future<VerifyGreenResult> execute() async {
-    final state = await tddCycle.savedTddState();
+    final state = await stateStore.currentState();
     if (state.phase != TddPhase.green) {
       final msg =
           'verify-green can only be run during GREEN phase (Current phase: ${state.phase.name.toUpperCase()}).';
@@ -94,11 +94,8 @@ final class VerifyGreenUseCase {
       );
     }
 
-    final newState = state.copyWith(
-      phase: TddPhase.refactor,
-      lastUpdated: DateTime.now(),
-    );
-    await tddCycle.save(newState);
+    final newState = state.toRefactor();
+    await stateStore.save(newState);
 
     if (state.activeSpecId != null) {
       await specStore.updateSpecStatus(state.activeSpecId!, 'refactor');

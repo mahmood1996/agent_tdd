@@ -3,7 +3,7 @@ import 'package:agent_file_snapshot/agent_file_snapshot.dart';
 import 'package:path/path.dart' as p;
 
 import '../../../core/data/config_store.dart';
-import '../../../core/data/tdd_cycle.dart';
+import '../../../core/data/tdd_state_store.dart';
 import '../../../core/domain/tdd_config.dart';
 import '../../../core/domain/tdd_constants.dart';
 import '../../../core/domain/tdd_state.dart';
@@ -27,7 +27,7 @@ final class VerifyRedResult {
 final class VerifyRedUseCase {
   final ConfigStore configStore;
   final SpecStore specStore;
-  final TddCycle tddCycle;
+  final TddStateStore stateStore;
   final TestRunVerifications testRunVerifications;
   final CaptureSnapshot captureSnapshot;
   final GitClient gitClient;
@@ -36,13 +36,13 @@ final class VerifyRedUseCase {
     required String projectDir,
     ConfigStore? configStore,
     SpecStore? specStore,
-    TddCycle? tddCycle,
+    TddStateStore? stateStore,
     TestRunVerifications? testRunVerifications,
     CaptureSnapshot? captureSnapshot,
     GitClient? gitClient,
   })  : configStore = configStore ?? ConfigStore(projectDir: projectDir),
         specStore = specStore ?? FileSpecStore(projectDir, 'specs.yaml'),
-        tddCycle = tddCycle ?? TddCycle(projectDir: projectDir),
+        stateStore = stateStore ?? TddStateStore(projectDir: projectDir),
         captureSnapshot = captureSnapshot ??
             CaptureSnapshot(
               baseDir: projectDir,
@@ -53,7 +53,7 @@ final class VerifyRedUseCase {
         gitClient = gitClient ?? GitClient(projectDir: projectDir);
 
   Future<VerifyRedResult> execute() async {
-    final state = await tddCycle.savedTddState();
+    final state = await stateStore.currentState();
     if (state.phase != TddPhase.red) {
       final msg =
           'verify-red can only be run during RED phase (Current phase: ${state.phase.name.toUpperCase()}).';
@@ -80,11 +80,8 @@ final class VerifyRedUseCase {
     }
 
     if (ver.phase == 'ALREADY_PASSED') {
-      final newState = state.copyWith(
-        phase: TddPhase.alreadyPassed,
-        lastUpdated: DateTime.now(),
-      );
-      await tddCycle.save(newState);
+      final newState = state.toAlreadyPassed();
+      await stateStore.save(newState);
 
       if (state.activeSpecId != null) {
         await specStore.updateSpecStatus(state.activeSpecId!, 'already_passed');
@@ -101,11 +98,8 @@ final class VerifyRedUseCase {
 
     await captureSnapshot(config.testFiles);
 
-    final newState = state.copyWith(
-      phase: TddPhase.green,
-      lastUpdated: DateTime.now(),
-    );
-    await tddCycle.save(newState);
+    final newState = state.toGreen();
+    await stateStore.save(newState);
 
     if (state.activeSpecId != null) {
       await specStore.updateSpecStatus(state.activeSpecId!, 'green');

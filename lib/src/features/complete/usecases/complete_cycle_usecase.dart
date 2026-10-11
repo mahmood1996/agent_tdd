@@ -2,7 +2,7 @@ import 'package:agent_file_snapshot/agent_file_snapshot.dart';
 import 'package:path/path.dart' as p;
 
 import '../../../core/data/config_store.dart';
-import '../../../core/data/tdd_cycle.dart';
+import '../../../core/data/tdd_state_store.dart';
 import 'package:tdd_spec_store/tdd_spec_store.dart';
 import '../../../core/domain/tdd_constants.dart';
 import '../../../core/domain/tdd_state.dart';
@@ -30,7 +30,7 @@ final class CompleteCycleUseCase {
   final String projectDir;
   final ConfigStore configStore;
   final TddSpecStore specStore;
-  final TddCycle tddCycle;
+  final TddStateStore stateStore;
   final DeleteSnapshot deleteSnapshot;
   final GitClient gitClient;
 
@@ -38,12 +38,12 @@ final class CompleteCycleUseCase {
     required this.projectDir,
     ConfigStore? configStore,
     TddSpecStore? specStore,
-    TddCycle? tddCycle,
+    TddStateStore? stateStore,
     GitClient? gitClient,
     DeleteSnapshot? deleteSnapshot,
   })  : configStore = configStore ?? ConfigStore(projectDir: projectDir),
         specStore = specStore ?? TddSpecStore.file(projectDir),
-        tddCycle = tddCycle ?? TddCycle(projectDir: projectDir),
+        stateStore = stateStore ?? TddStateStore(projectDir: projectDir),
         gitClient = gitClient ?? GitClient(projectDir: projectDir),
         deleteSnapshot = deleteSnapshot ??
             DeleteSnapshot(
@@ -51,7 +51,7 @@ final class CompleteCycleUseCase {
                     p.join(projectDir, TddConstants.snapshotFileName));
 
   Future<CompleteCycleResult> execute() async {
-    final state = await tddCycle.savedTddState();
+    final state = await stateStore.currentState();
     final isAlreadyPassed = state.phase == TddPhase.alreadyPassed;
 
     if (state.phase != TddPhase.refactor && !isAlreadyPassed) {
@@ -82,10 +82,10 @@ final class CompleteCycleUseCase {
     }
 
     await deleteSnapshot();
-    await tddCycle.reset();
+    await stateStore.reset();
 
     final summary = await specStore.summary();
-    final resetState = await tddCycle.savedTddState();
+    final resetState = await stateStore.currentState();
 
     final messageStr = isAlreadyPassed
         ? 'Spec #$activeId was already satisfied and marked DONE! Run "agent-tdd next" to pick up the next pending spec item.'

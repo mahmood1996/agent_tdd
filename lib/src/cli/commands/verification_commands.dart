@@ -1,5 +1,5 @@
 import '../../core/data/config_store.dart';
-import '../../core/data/tdd_cycle.dart';
+import '../../core/data/tdd_state_store.dart';
 import 'package:tdd_spec_store/tdd_spec_store.dart';
 import '../../core/domain/tdd_state.dart';
 import '../../core/services/analyzer.dart';
@@ -15,7 +15,7 @@ final class VerificationCommands {
   final String projectDir;
   final ConfigStore configStore;
   final TddSpecStore specStore;
-  final TddCycle tddCycle;
+  final TddStateStore stateStore;
   final TestRunVerifications testRunVerifications;
   final Analyzer analyzer;
   final GitClient gitClient;
@@ -25,7 +25,7 @@ final class VerificationCommands {
     required this.projectDir,
     required this.configStore,
     required this.specStore,
-    required this.tddCycle,
+    required this.stateStore,
     required this.testRunVerifications,
     required this.analyzer,
     required this.gitClient,
@@ -37,7 +37,7 @@ final class VerificationCommands {
       projectDir: projectDir,
       configStore: configStore,
       specStore: specStore,
-      tddCycle: tddCycle,
+      stateStore: stateStore,
       testRunVerifications: testRunVerifications,
       gitClient: gitClient,
     );
@@ -55,7 +55,7 @@ final class VerificationCommands {
         projectDir: projectDir,
         configStore: configStore,
         specStore: specStore,
-        tddCycle: tddCycle,
+        stateStore: stateStore,
         gitClient: gitClient,
       );
       final completeRes = await completeUseCase.execute();
@@ -71,7 +71,7 @@ final class VerificationCommands {
       projectDir: projectDir,
       configStore: configStore,
       specStore: specStore,
-      tddCycle: tddCycle,
+      stateStore: stateStore,
       testRunVerifications: testRunVerifications,
       gitClient: gitClient,
     );
@@ -83,7 +83,7 @@ final class VerificationCommands {
     final useCase = VerifyRefactorUseCase(
       projectDir: projectDir,
       configStore: configStore,
-      tddCycle: tddCycle,
+      stateStore: stateStore,
       testRunVerifications: testRunVerifications,
       analyzer: analyzer,
     );

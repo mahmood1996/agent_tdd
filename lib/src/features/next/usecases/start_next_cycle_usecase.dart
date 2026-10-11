@@ -1,7 +1,7 @@
 import 'package:agent_backlog/agent_backlog.dart';
 
 import '../../../core/data/config_store.dart';
-import '../../../core/data/tdd_cycle.dart';
+import '../../../core/data/tdd_state_store.dart';
 import '../../../core/domain/tdd_config.dart';
 import '../../../core/domain/tdd_state.dart';
 
@@ -25,19 +25,19 @@ final class StartNextCycleUseCase {
   final String projectDir;
   final ConfigStore configStore;
   final SpecStore specStore;
-  final TddCycle tddCycle;
+  final TddStateStore stateStore;
 
   StartNextCycleUseCase({
     required this.projectDir,
     ConfigStore? configStore,
     SpecStore? specStore,
-    TddCycle? tddCycle,
+    TddStateStore? stateStore,
   })  : configStore = configStore ?? ConfigStore(projectDir: projectDir),
         specStore = specStore ?? FileSpecStore(projectDir, 'specs.yaml'),
-        tddCycle = tddCycle ?? TddCycle(projectDir: projectDir);
+        stateStore = stateStore ?? TddStateStore(projectDir: projectDir);
 
   Future<StartNextCycleResult> execute() async {
-    final currentState = await tddCycle.savedTddState();
+    final currentState = await stateStore.currentState();
 
     if (currentState.phase != TddPhase.idle) {
       final msg =
@@ -60,14 +60,8 @@ final class StartNextCycleUseCase {
       );
     }
 
-    final newState = TddState(
-      phase: TddPhase.red,
-      activeSpecId: pendingSpec.id,
-      activeSpecTitle: pendingSpec.title,
-      startedAt: DateTime.now(),
-      lastUpdated: DateTime.now(),
-    );
-    await tddCycle.save(newState);
+    final newState = TddState.red(pendingSpec);
+    await stateStore.save(newState);
     await specStore.updateSpecStatus(pendingSpec.id, 'red');
 
     final config = await configStore.config();

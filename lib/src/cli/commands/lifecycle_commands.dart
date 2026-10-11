@@ -1,5 +1,5 @@
 import '../../core/data/config_store.dart';
-import '../../core/data/tdd_cycle.dart';
+import '../../core/data/tdd_state_store.dart';
 import 'package:tdd_spec_store/tdd_spec_store.dart';
 import '../../core/services/git_client.dart';
 import '../../features/complete/usecases/complete_cycle_usecase.dart';
@@ -12,7 +12,7 @@ final class LifecycleCommands {
   final String projectDir;
   final ConfigStore configStore;
   final TddSpecStore specStore;
-  final TddCycle tddCycle;
+  final TddStateStore stateStore;
   final GitClient gitClient;
   final LifecyclePresenter presenter;
 
@@ -20,7 +20,7 @@ final class LifecycleCommands {
     required this.projectDir,
     required this.configStore,
     required this.specStore,
-    required this.tddCycle,
+    required this.stateStore,
     required this.gitClient,
     this.presenter = const LifecyclePresenter(),
   });
@@ -30,7 +30,7 @@ final class LifecycleCommands {
       projectDir: projectDir,
       configStore: configStore,
       specStore: specStore,
-      tddCycle: tddCycle,
+      stateStore: stateStore,
     );
     final res = await useCase.execute();
     presenter.renderNext(res);
@@ -41,7 +41,7 @@ final class LifecycleCommands {
       projectDir: projectDir,
       configStore: configStore,
       specStore: specStore,
-      tddCycle: tddCycle,
+      stateStore: stateStore,
       gitClient: gitClient,
     );
     final res = await useCase.execute();
@@ -53,7 +53,7 @@ final class LifecycleCommands {
       projectDir: projectDir,
       configStore: configStore,
       specStore: specStore,
-      tddCycle: tddCycle,
+      stateStore: stateStore,
     );
     final res = await useCase.execute();
     presenter.renderStatus(res, projectDir);
@@ -62,7 +62,7 @@ final class LifecycleCommands {
   Future<void> reset() async {
     final useCase = ResetCycleUseCase(
       projectDir: projectDir,
-      tddCycle: tddCycle,
+      stateStore: stateStore,
     );
     final res = await useCase.execute();
     presenter.renderReset(res);

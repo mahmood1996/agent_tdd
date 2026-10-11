@@ -1,5 +1,5 @@
 import '../core/data/config_store.dart';
-import '../core/data/tdd_cycle.dart';
+import '../core/data/tdd_state_store.dart';
 import 'package:tdd_spec_store/tdd_spec_store.dart';
 import '../core/services/analyzer.dart';
 import '../core/services/git_client.dart';
@@ -18,7 +18,7 @@ final class CliRunner {
   final String projectDir;
   final ConfigStore configStore;
   final TddSpecStore specStore;
-  final TddCycle tddCycle;
+  final TddStateStore stateStore;
   final TestRunVerifications testRunVerifications;
   final Analyzer analyzer;
   final GitClient gitClient;
@@ -33,7 +33,7 @@ final class CliRunner {
     required this.projectDir,
     ConfigStore? configStore,
     TddSpecStore? specStore,
-    TddCycle? tddCycle,
+    TddStateStore? stateStore,
     TestRunVerifications? testRunVerifications,
     Analyzer? analyzer,
     GitClient? gitClient,
@@ -44,7 +44,7 @@ final class CliRunner {
     FallbackPresenter fallbackPresenter = const FallbackPresenter(),
   })  : configStore = configStore ?? ConfigStore(projectDir: projectDir),
         specStore = specStore ?? TddSpecStore.file(projectDir),
-        tddCycle = tddCycle ?? TddCycle(projectDir: projectDir),
+        stateStore = stateStore ?? TddStateStore(projectDir: projectDir),
         testRunVerifications = testRunVerifications ??
             TestRunVerifications(projectDir, configStore: configStore),
         analyzer = analyzer ??
@@ -60,14 +60,14 @@ final class CliRunner {
         _specsCommand = SpecsCommand(
           projectDir: projectDir,
           specStore: specStore ?? TddSpecStore.file(projectDir),
-          tddCycle: tddCycle ?? TddCycle(projectDir: projectDir),
+          stateStore: stateStore ?? TddStateStore(projectDir: projectDir),
           presenter: specsPresenter,
         ),
         _verificationCommands = VerificationCommands(
           projectDir: projectDir,
           configStore: configStore ?? ConfigStore(projectDir: projectDir),
           specStore: specStore ?? TddSpecStore.file(projectDir),
-          tddCycle: tddCycle ?? TddCycle(projectDir: projectDir),
+          stateStore: stateStore ?? TddStateStore(projectDir: projectDir),
           testRunVerifications: testRunVerifications ??
               TestRunVerifications(projectDir, configStore: configStore),
           analyzer: analyzer ??
@@ -79,7 +79,7 @@ final class CliRunner {
           projectDir: projectDir,
           configStore: configStore ?? ConfigStore(projectDir: projectDir),
           specStore: specStore ?? TddSpecStore.file(projectDir),
-          tddCycle: tddCycle ?? TddCycle(projectDir: projectDir),
+          stateStore: stateStore ?? TddStateStore(projectDir: projectDir),
           gitClient: gitClient ?? GitClient(projectDir: projectDir),
           presenter: lifecyclePresenter,
         );
@@ -136,7 +136,7 @@ final class CliRunner {
         break;
 
       default:
-        final state = await tddCycle.savedTddState();
+        final state = await stateStore.currentState();
         _fallbackPresenter.renderUnknownCommand(
           command,
           state.phase.name.toUpperCase(),

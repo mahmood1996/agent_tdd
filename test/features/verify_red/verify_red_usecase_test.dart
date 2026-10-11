@@ -64,14 +64,10 @@ void main() {
         () async {
       final specStore = TddSpecStore.file(harness.tempDir.path);
       await specStore.addSpec('Spec 1');
-      final cycle = TddCycle(projectDir: harness.tempDir.path);
-      await cycle.save(TddState(
-        phase: TddPhase.red,
-        activeSpecId: 1,
-        activeSpecTitle: 'Spec 1',
-        startedAt: DateTime.now(),
-        lastUpdated: DateTime.now(),
-      ));
+      final spec = (await specStore.specs()).first;
+
+      final store = TddStateStore(projectDir: harness.tempDir.path);
+      await store.save(TddState.red(spec));
 
       final mockRunner = MockTestRunVerifications(
         projectDir: harness.tempDir.path,
@@ -113,14 +109,10 @@ void main() {
 
       final specStore = TddSpecStore.file(harness.tempDir.path);
       await specStore.addSpec('Spec 1');
-      final cycle = TddCycle(projectDir: harness.tempDir.path);
-      await cycle.save(TddState(
-        phase: TddPhase.red,
-        activeSpecId: 1,
-        activeSpecTitle: 'Spec 1',
-        startedAt: DateTime.now(),
-        lastUpdated: DateTime.now(),
-      ));
+      final spec = (await specStore.specs()).first;
+
+      final store = TddStateStore(projectDir: harness.tempDir.path);
+      await store.save(TddState.red(spec));
 
       final mockRunner = MockTestRunVerifications(
         projectDir: harness.tempDir.path,

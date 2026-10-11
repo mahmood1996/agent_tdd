@@ -1,7 +1,7 @@
 import 'package:agent_file_snapshot/agent_file_snapshot.dart';
 import 'package:path/path.dart' as p;
 
-import '../../../core/data/tdd_cycle.dart';
+import '../../../core/data/tdd_state_store.dart';
 import '../../../core/domain/tdd_constants.dart';
 
 final class ResetCycleResult {
@@ -14,20 +14,20 @@ final class ResetCycleUseCase {
   ResetCycleUseCase({
     required String projectDir,
     DeleteSnapshot? deleteSnapshot,
-    TddCycle? tddCycle,
+    TddStateStore? stateStore,
   })  : deleteSnapshot = deleteSnapshot ??
             DeleteSnapshot(
               snapshotPath: p.join(projectDir, TddConstants.snapshotFileName),
             ),
-        tddCycle = tddCycle ?? TddCycle(projectDir: projectDir);
+        stateStore = stateStore ?? TddStateStore(projectDir: projectDir);
 
-  final TddCycle tddCycle;
+  final TddStateStore stateStore;
 
   final DeleteSnapshot deleteSnapshot;
 
   Future<ResetCycleResult> execute() async {
     await deleteSnapshot();
-    await tddCycle.reset();
+    await stateStore.reset();
     return const ResetCycleResult(success: true);
   }
 }

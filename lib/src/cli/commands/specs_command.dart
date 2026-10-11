@@ -1,4 +1,4 @@
-import '../../core/data/tdd_cycle.dart';
+import '../../core/data/tdd_state_store.dart';
 import 'package:tdd_spec_store/tdd_spec_store.dart';
 import '../../features/specs/usecases/add_spec_usecase.dart';
 import '../../features/specs/usecases/import_specs_usecase.dart';
@@ -8,13 +8,13 @@ import '../presenter/specs_presenter.dart';
 final class SpecsCommand {
   final String projectDir;
   final TddSpecStore specStore;
-  final TddCycle tddCycle;
+  final TddStateStore stateStore;
   final SpecsPresenter presenter;
 
   const SpecsCommand({
     required this.projectDir,
     required this.specStore,
-    required this.tddCycle,
+    required this.stateStore,
     this.presenter = const SpecsPresenter(),
   });
 
@@ -23,7 +23,7 @@ final class SpecsCommand {
       final useCase = ListSpecsUseCase(
         projectDir: projectDir,
         specStore: specStore,
-        tddCycle: tddCycle,
+        stateStore: stateStore,
       );
       final res = await useCase.execute();
       presenter.renderSpecsList(res);
@@ -33,7 +33,7 @@ final class SpecsCommand {
     final subCmd = args.first;
     if (subCmd == 'add') {
       if (args.length <= 1) {
-        final state = await tddCycle.savedTddState();
+        final state = await stateStore.currentState();
         presenter.renderSpecsAddError(
           'Missing spec title. Usage: agent-tdd specs add "<title>"',
           state.phase.name.toUpperCase(),
@@ -45,7 +45,7 @@ final class SpecsCommand {
       final useCase = AddSpecUseCase(
         projectDir: projectDir,
         specStore: specStore,
-        tddCycle: tddCycle,
+        stateStore: stateStore,
       );
       final res = await useCase.execute(title);
       presenter.renderSpecsAddSuccess(res, title);
@@ -54,7 +54,7 @@ final class SpecsCommand {
 
     if (subCmd == 'import') {
       if (args.length <= 1) {
-        final state = await tddCycle.savedTddState();
+        final state = await stateStore.currentState();
         presenter.renderSpecsImportError(
           'Missing file path. Usage: agent-tdd specs import <file.md|file.yaml>',
           state.phase.name.toUpperCase(),
@@ -67,12 +67,12 @@ final class SpecsCommand {
         specStore: specStore,
       );
       final res = await useCase.execute(args[1]);
-      final state = await tddCycle.savedTddState();
+      final state = await stateStore.currentState();
       presenter.renderSpecsImportSuccess(res, state);
       return;
     }
 
-    final state = await tddCycle.savedTddState();
+    final state = await stateStore.currentState();
     presenter.renderSpecsUnknownSubcommand(
         subCmd, state.phase.name.toUpperCase());
   }

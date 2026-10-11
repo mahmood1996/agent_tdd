@@ -1,5 +1,5 @@
 import '../../../core/data/config_store.dart';
-import '../../../core/data/tdd_cycle.dart';
+import '../../../core/data/tdd_state_store.dart';
 import '../../../core/domain/analysis_issue.dart';
 import '../../../core/domain/tdd_config.dart';
 import '../../../core/domain/tdd_state.dart';
@@ -25,25 +25,25 @@ final class VerifyRefactorResult {
 final class VerifyRefactorUseCase {
   final String projectDir;
   final ConfigStore configStore;
-  final TddCycle tddCycle;
+  final TddStateStore stateStore;
   final TestRunVerifications testRunVerifications;
   final Analyzer analyzer;
 
   VerifyRefactorUseCase({
     required this.projectDir,
     ConfigStore? configStore,
-    TddCycle? tddCycle,
+    TddStateStore? stateStore,
     TestRunVerifications? testRunVerifications,
     Analyzer? analyzer,
   })  : configStore = configStore ?? ConfigStore(projectDir: projectDir),
-        tddCycle = tddCycle ?? TddCycle(projectDir: projectDir),
+        stateStore = stateStore ?? TddStateStore(projectDir: projectDir),
         testRunVerifications = testRunVerifications ??
             TestRunVerifications(projectDir, configStore: configStore),
         analyzer = analyzer ??
             Analyzer(projectDir: projectDir, configStore: configStore);
 
   Future<VerifyRefactorResult> execute() async {
-    final state = await tddCycle.savedTddState();
+    final state = await stateStore.currentState();
     if (state.phase != TddPhase.refactor) {
       final msg =
           'verify-refactor can only be run during REFACTOR phase (Current phase: ${state.phase.name.toUpperCase()}).';

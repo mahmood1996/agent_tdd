@@ -2,6 +2,7 @@ import 'package:agent_tdd/agent_tdd.dart';
 import 'package:test/test.dart';
 
 import '../../helpers/base_test_harness.dart';
+import '../../helpers/fake_spec.dart';
 
 class MockTestRunVerifications extends TestRunVerifications {
   TestRunVerification mockVerification;
@@ -56,14 +57,10 @@ void main() {
     });
 
     test('execute fails if tests regress during refactoring', () async {
-      final cycle = TddCycle(projectDir: harness.tempDir.path);
-      await cycle.save(TddState(
-        phase: TddPhase.refactor,
-        activeSpecId: 1,
-        activeSpecTitle: 'Spec 1',
-        startedAt: DateTime.now(),
-        lastUpdated: DateTime.now(),
-      ));
+      final store = TddStateStore(projectDir: harness.tempDir.path);
+      await store.save(
+        TddState.refactor(const FakeSpec(id: 1, title: 'Spec 1')),
+      );
 
       final mockRunner = MockTestRunVerifications(
         projectDir: harness.tempDir.path,
@@ -92,14 +89,10 @@ void main() {
     });
 
     test('execute fails if static analysis detects issues', () async {
-      final cycle = TddCycle(projectDir: harness.tempDir.path);
-      await cycle.save(TddState(
-        phase: TddPhase.refactor,
-        activeSpecId: 1,
-        activeSpecTitle: 'Spec 1',
-        startedAt: DateTime.now(),
-        lastUpdated: DateTime.now(),
-      ));
+      final store = TddStateStore(projectDir: harness.tempDir.path);
+      await store.save(
+        TddState.refactor(const FakeSpec(id: 1, title: 'Spec 1')),
+      );
 
       final mockRunner = MockTestRunVerifications(
         projectDir: harness.tempDir.path,
@@ -148,14 +141,10 @@ void main() {
 
     test('execute succeeds when 100% tests pass and static analysis is clean',
         () async {
-      final cycle = TddCycle(projectDir: harness.tempDir.path);
-      await cycle.save(TddState(
-        phase: TddPhase.refactor,
-        activeSpecId: 1,
-        activeSpecTitle: 'Spec 1',
-        startedAt: DateTime.now(),
-        lastUpdated: DateTime.now(),
-      ));
+      final store = TddStateStore(projectDir: harness.tempDir.path);
+      await store.save(
+        TddState.refactor(const FakeSpec(id: 1, title: 'Spec 1')),
+      );
 
       final mockRunner = MockTestRunVerifications(
         projectDir: harness.tempDir.path,

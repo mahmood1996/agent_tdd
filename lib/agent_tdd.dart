@@ -11,7 +11,7 @@ export 'src/core/domain/analysis_issue.dart';
 
 export 'package:tdd_spec_store/tdd_spec_store.dart';
 export 'src/core/data/config_store.dart';
-export 'src/core/data/tdd_cycle.dart';
+export 'src/core/data/tdd_state_store.dart';
 
 export 'src/core/services/processes.dart';
 export 'src/core/services/test_run_verifications.dart';

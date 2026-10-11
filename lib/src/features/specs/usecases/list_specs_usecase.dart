@@ -1,6 +1,6 @@
 import 'package:agent_backlog/agent_backlog.dart';
 
-import '../../../core/data/tdd_cycle.dart';
+import '../../../core/data/tdd_state_store.dart';
 import 'package:tdd_spec_store/tdd_spec_store.dart';
 import '../../../core/domain/tdd_state.dart';
 
@@ -19,17 +19,17 @@ final class ListSpecsResult {
 final class ListSpecsUseCase {
   final String projectDir;
   final TddSpecStore specStore;
-  final TddCycle tddCycle;
+  final TddStateStore stateStore;
 
   ListSpecsUseCase({
     required this.projectDir,
     TddSpecStore? specStore,
-    TddCycle? tddCycle,
+    TddStateStore? stateStore,
   })  : specStore = specStore ?? TddSpecStore.file(projectDir),
-        tddCycle = tddCycle ?? TddCycle(projectDir: projectDir);
+        stateStore = stateStore ?? TddStateStore(projectDir: projectDir);
 
   Future<ListSpecsResult> execute() async {
-    final currentState = await tddCycle.savedTddState();
+    final currentState = await stateStore.currentState();
     final summary = await specStore.summary();
     final specs = await specStore.specs();
 
