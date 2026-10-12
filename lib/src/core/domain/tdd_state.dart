@@ -22,7 +22,7 @@ abstract interface class TddState {
   factory TddState.alreadyPassed(Spec spec) = _TddStateImpl.alreadyPassed;
 
   /// Restores [TddState] from JSON map.
-  factory TddState.fromJson(Map<String, dynamic> json) = _TddStateImpl.fromJson;
+  factory TddState.fromMap(Map<String, dynamic> data) = _TddStateImpl.fromMap;
 
   // Pure getters
   TddPhase get phase;
@@ -67,7 +67,7 @@ extension SmartTddState on TddState {
     );
   }
 
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toMap() => {
         'phase': phase.name.toUpperCase(),
         'active_spec_id': activeSpecId,
         'active_spec_title': activeSpecTitle,
@@ -121,7 +121,7 @@ final class _TddStateImpl implements TddState {
         startedAt = DateTime.now(),
         lastUpdated = DateTime.now();
 
-  factory _TddStateImpl.fromJson(Map<String, dynamic> json) {
+  factory _TddStateImpl.fromMap(Map<String, dynamic> json) {
     final phaseStr = json['phase']?.toString().toLowerCase() ?? 'idle';
     final phase = switch (phaseStr) {
       'red' => TddPhase.red,

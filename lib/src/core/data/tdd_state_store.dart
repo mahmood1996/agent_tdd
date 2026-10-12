@@ -36,13 +36,13 @@ final class _FileTddStateStore implements TddStateStore {
 
   Future<TddState> _tryLoadSavedState() async =>
       switch (await _resource.content()) {
-        final Map json => TddState.fromJson(Map<String, dynamic>.from(json)),
+        final Map json => TddState.fromMap(Map<String, dynamic>.from(json)),
         _ => TddState.idle(),
       };
 
   @override
   Future<void> save(TddState state) async =>
-      await _resource.save(state.toJson());
+      await _resource.save(state.toMap());
 
   @override
   Future<void> reset() async => await _resource.delete();
