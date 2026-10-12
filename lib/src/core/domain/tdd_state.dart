@@ -22,7 +22,7 @@ abstract interface class TddState {
   factory TddState.alreadyPassed(Spec spec) = _TddStateImpl.alreadyPassed;
 
   /// Restores [TddState] from JSON map.
-  factory TddState.fromMap(Map<String, dynamic> data) = _TddStateImpl.fromMap;
+  factory TddState.fromJson(Map<String, dynamic> data) = _TddStateImpl.fromJson;
 
   // Pure getters
   TddPhase get phase;
@@ -67,7 +67,7 @@ extension SmartTddState on TddState {
     );
   }
 
-  Map<String, dynamic> toMap() => {
+  Map<String, dynamic> toJson() => {
         'phase': phase.name.toUpperCase(),
         'active_spec_id': activeSpecId,
         'active_spec_title': activeSpecTitle,
@@ -78,50 +78,52 @@ extension SmartTddState on TddState {
 
 /// Private concrete implementation
 final class _TddStateImpl implements TddState {
-  _TddStateImpl._internal({
-    required this.phase,
-    this.activeSpecId,
-    this.activeSpecTitle,
-    required this.startedAt,
-    required this.lastUpdated,
-  });
-
   _TddStateImpl.idle()
-      : phase = TddPhase.idle,
-        activeSpecId = null,
-        activeSpecTitle = null,
-        startedAt = DateTime.now(),
-        lastUpdated = DateTime.now();
+      : this._internal(
+          phase: TddPhase.idle,
+          activeSpecId: null,
+          activeSpecTitle: null,
+          startedAt: DateTime.now(),
+          lastUpdated: DateTime.now(),
+        );
 
   _TddStateImpl.red(Spec spec)
-      : phase = TddPhase.red,
-        activeSpecId = spec.id,
-        activeSpecTitle = spec.title,
-        startedAt = DateTime.now(),
-        lastUpdated = DateTime.now();
+      : this._internal(
+          phase: TddPhase.red,
+          activeSpecId: spec.id,
+          activeSpecTitle: spec.title,
+          startedAt: DateTime.now(),
+          lastUpdated: DateTime.now(),
+        );
 
   _TddStateImpl.green(Spec spec)
-      : phase = TddPhase.green,
-        activeSpecId = spec.id,
-        activeSpecTitle = spec.title,
-        startedAt = DateTime.now(),
-        lastUpdated = DateTime.now();
+      : this._internal(
+          phase: TddPhase.green,
+          activeSpecId: spec.id,
+          activeSpecTitle: spec.title,
+          startedAt: DateTime.now(),
+          lastUpdated: DateTime.now(),
+        );
 
   _TddStateImpl.refactor(Spec spec)
-      : phase = TddPhase.refactor,
-        activeSpecId = spec.id,
-        activeSpecTitle = spec.title,
-        startedAt = DateTime.now(),
-        lastUpdated = DateTime.now();
+      : this._internal(
+          phase: TddPhase.refactor,
+          activeSpecId: spec.id,
+          activeSpecTitle: spec.title,
+          startedAt: DateTime.now(),
+          lastUpdated: DateTime.now(),
+        );
 
   _TddStateImpl.alreadyPassed(Spec spec)
-      : phase = TddPhase.alreadyPassed,
-        activeSpecId = spec.id,
-        activeSpecTitle = spec.title,
-        startedAt = DateTime.now(),
-        lastUpdated = DateTime.now();
+      : this._internal(
+          phase: TddPhase.alreadyPassed,
+          activeSpecId: spec.id,
+          activeSpecTitle: spec.title,
+          startedAt: DateTime.now(),
+          lastUpdated: DateTime.now(),
+        );
 
-  factory _TddStateImpl.fromMap(Map<String, dynamic> json) {
+  factory _TddStateImpl.fromJson(Map<String, dynamic> json) {
     final phaseStr = json['phase']?.toString().toLowerCase() ?? 'idle';
     final phase = switch (phaseStr) {
       'red' => TddPhase.red,
@@ -141,6 +143,14 @@ final class _TddStateImpl implements TddState {
           DateTime.now(),
     );
   }
+
+  _TddStateImpl._internal({
+    required this.phase,
+    this.activeSpecId,
+    this.activeSpecTitle,
+    required this.startedAt,
+    required this.lastUpdated,
+  });
 
   @override
   final TddPhase phase;
