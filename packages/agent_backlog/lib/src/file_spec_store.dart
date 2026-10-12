@@ -27,7 +27,7 @@ final class FileSpecStore implements SpecStore {
   Future<List<Spec>> _tryGettingSavedSpecs() async {
     return List.from(await _resource.content() ?? [])
         .map(
-          (item) => _Spec.fromMap(
+          (item) => Spec.fromJson(
             Map<String, dynamic>.from(item),
           ),
         )
@@ -45,8 +45,8 @@ final class FileSpecStore implements SpecStore {
         : currentSpecs.map((s) => s.id).reduce((a, b) => a > b ? a : b) + 1;
 
     await _resource.save([
-      ...currentSpecs.map((t) => _Spec(t).toMap()),
-      ...incoming.map((spec) => _Spec.fromNewSpec(spec, nextId++).toMap()),
+      ...currentSpecs.map((t) => t.toJson()),
+      ...incoming.map((spec) => Spec.from(spec, nextId++).toJson()),
     ]);
   }
 
@@ -56,68 +56,8 @@ final class FileSpecStore implements SpecStore {
       (await specs())
           .map((s) => s.id == specId ? s.copyWith(status: newStatus) : s)
           .toList()
-          .map((t) => _Spec(t).toMap())
+          .map((t) => t.toJson())
           .toList(),
     );
   }
-}
-
-/// Internal implementation of [Spec] for YAML serialization.
-final class _Spec implements Spec {
-  _Spec(Spec spec)
-      : id = spec.id,
-        title = spec.title,
-        status = spec.status,
-        description = spec.description,
-        metadata = Map<String, dynamic>.unmodifiable(spec.metadata);
-
-  _Spec.fromNewSpec(NewSpec spec, int newId)
-      : id = newId,
-        title = spec.title,
-        status = spec.status,
-        description = spec.description,
-        metadata = Map<String, dynamic>.unmodifiable(spec.metadata);
-
-  _Spec.raw({
-    required this.id,
-    required this.title,
-    required this.status,
-    required this.metadata,
-    required this.description,
-  });
-
-  factory _Spec.fromMap(Map<String, dynamic> map) {
-    return _Spec.raw(
-      id: map['id'] as int? ?? 0,
-      title: map['title']?.toString() ?? '',
-      description: map['description']?.toString() ?? '',
-      status: map['status']?.toString() ?? 'pending',
-      metadata: map['metadata'] != null
-          ? Map<String, dynamic>.from(map['metadata'] as Map)
-          : const {},
-    );
-  }
-
-  @override
-  final int id;
-
-  @override
-  final String title;
-
-  @override
-  final String description;
-
-  @override
-  final String status;
-
-  @override
-  final Map<String, dynamic> metadata;
-
-  Map<String, dynamic> toMap() => {
-        'id': id,
-        'title': title,
-        'status': status,
-        'metadata': metadata,
-        'description': description,
-      };
 }
