@@ -1,7 +1,8 @@
+import 'dart:io';
+
 import '../data/config_store.dart';
 import '../domain/analysis_issue.dart';
-import '../domain/executable_process_result.dart';
-import 'processes.dart';
+import 'package:processes/processes.dart';
 
 class Analyzer {
   final String projectDir;
@@ -22,11 +23,8 @@ class Analyzer {
       return AnalysisResult(
         isClean: true,
         issues: [],
-        rawResult: const ExecutableProcessResult(
-          exitCode: 0,
-          stdout: 'No analyze_command configured.',
-          stderr: '',
-          durationMs: 0,
+        rawResult: ExecutableProcessResult(
+          ProcessResult(0, 0, 'No analyze_command configured.', ''),
         ),
       );
     }

@@ -187,12 +187,6 @@ void main() {
           phase: 'ALREADY_PASSED',
           message:
               'Tests PASSED! Spec requirement is already satisfied in production code.',
-          result: ExecutableProcessResult(
-            exitCode: 0,
-            stdout: 'All tests passed',
-            stderr: '',
-            durationMs: 50,
-          ),
         ),
       );
       final runner = CliRunner(
@@ -222,12 +216,6 @@ void main() {
           phase: 'RED',
           message:
               'Compilation/Syntax error detected! Fix syntax errors before verifying RED state.',
-          result: ExecutableProcessResult(
-            exitCode: 1,
-            stdout: 'SyntaxError: Unexpected token',
-            stderr: '',
-            durationMs: 50,
-          ),
         ),
       );
       final runner = CliRunner(

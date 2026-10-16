@@ -115,12 +115,6 @@ void main() {
           isValid: false,
           phase: 'GREEN',
           message: 'Tests failed! GREEN phase requires ALL tests to pass.',
-          result: ExecutableProcessResult(
-            exitCode: 1,
-            stdout: '1 test failed',
-            stderr: '',
-            durationMs: 50,
-          ),
         ),
       );
 
@@ -160,12 +154,6 @@ void main() {
           isValid: true,
           phase: 'GREEN',
           message: '100% of tests passed! GREEN state verified.',
-          result: ExecutableProcessResult(
-            exitCode: 0,
-            stdout: 'All 5 tests passed',
-            stderr: '',
-            durationMs: 50,
-          ),
         ),
       );
       final mockGit = MockGitClient(projectDir: harness.tempDir.path);

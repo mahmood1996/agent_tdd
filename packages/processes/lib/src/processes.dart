@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import '../domain/executable_process_result.dart';
+import 'executable_process_result.dart';
 
 final class Processes {
   final String workingDirectory;
@@ -31,21 +31,12 @@ final class ExecutableProcess {
   });
 
   Future<void> execute() async {
-    final sw = Stopwatch()..start();
-
     final res = Platform.isWindows
         ? await Process.run('cmd.exe', ['/c', command],
             workingDirectory: workingDirectory)
         : await Process.run('sh', ['-c', command],
             workingDirectory: workingDirectory);
 
-    sw.stop();
-
-    onFinished?.call(ExecutableProcessResult(
-      exitCode: res.exitCode,
-      stdout: res.stdout.toString(),
-      stderr: res.stderr.toString(),
-      durationMs: sw.elapsedMilliseconds,
-    ));
+    onFinished?.call(ExecutableProcessResult(res));
   }
 }

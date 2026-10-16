@@ -27,6 +27,8 @@ dependencies:
     path: packages/config
   tdd_spec_store:
     path: packages/tdd_spec_store
+  processes:
+    path: packages/processes
 
 dev_dependencies:
   test: ^1.25.0

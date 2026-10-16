@@ -1,5 +1,4 @@
-import '../domain/executable_process_result.dart';
-import 'processes.dart';
+import 'package:processes/processes.dart';
 
 class GitClient {
   final String projectDir;

@@ -1,18 +1,15 @@
 import '../data/config_store.dart';
-import '../domain/executable_process_result.dart';
-import 'processes.dart';
+import 'package:processes/processes.dart';
 
 final class TestRunVerification {
   final bool isValid;
   final String phase; // RED, GREEN, or ALREADY_PASSED
   final String message;
-  final ExecutableProcessResult result;
 
   const TestRunVerification({
     required this.isValid,
     required this.phase,
     required this.message,
-    required this.result,
   });
 }
 
@@ -82,7 +79,6 @@ class TestRunVerifications {
         phase: 'RED',
         message:
             'Compilation/Syntax error detected! Fix syntax errors before verifying RED state.\nOutput:\n$output',
-        result: result,
       );
     }
 
@@ -92,7 +88,6 @@ class TestRunVerifications {
         phase: 'ALREADY_PASSED',
         message:
             'Tests PASSED! Spec requirement is already satisfied in production code.',
-        result: result,
       );
     }
 
@@ -111,7 +106,6 @@ class TestRunVerifications {
         phase: 'RED',
         message:
             'Test failed as expected on an assertion failure. RED state verified!',
-        result: result,
       );
     }
 
@@ -120,7 +114,6 @@ class TestRunVerifications {
       phase: 'RED',
       message:
           'Test run failed (exit code ${result.exitCode}). RED state verified.',
-      result: result,
     );
   }
 
@@ -130,14 +123,12 @@ class TestRunVerifications {
             isValid: true,
             phase: 'GREEN',
             message: '100% of tests passed! GREEN state verified.',
-            result: result,
           )
         : TestRunVerification(
             isValid: false,
             phase: 'GREEN',
             message:
                 'Tests failed! GREEN phase requires ALL tests to pass.\nOutput:\n${result.combinedOutput}',
-            result: result,
           );
   }
 
@@ -147,14 +138,12 @@ class TestRunVerifications {
             isValid: true,
             phase: 'REFACTOR',
             message: '100% of tests passed! REFACTOR state verified.',
-            result: result,
           )
         : TestRunVerification(
             isValid: false,
             phase: 'REFACTOR',
             message:
                 'Tests failed! REFACTOR phase requires ALL tests to pass.\nOutput:\n${result.combinedOutput}',
-            result: result,
           );
   }
 }

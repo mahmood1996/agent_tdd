@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:agent_tdd/agent_tdd.dart';
 import 'package:test/test.dart';
 
@@ -68,12 +70,6 @@ void main() {
           isValid: false,
           phase: 'REFACTOR',
           message: 'Tests failed! REFACTOR phase requires ALL tests to pass.',
-          result: ExecutableProcessResult(
-            exitCode: 1,
-            stdout: 'FAIL',
-            stderr: '',
-            durationMs: 50,
-          ),
         ),
       );
 
@@ -100,18 +96,12 @@ void main() {
           isValid: true,
           phase: 'REFACTOR',
           message: '100% of tests passed! REFACTOR state verified.',
-          result: ExecutableProcessResult(
-            exitCode: 0,
-            stdout: 'Pass',
-            stderr: '',
-            durationMs: 50,
-          ),
         ),
       );
 
       final mockAnalyzer = MockAnalyzer(
         projectDir: harness.tempDir.path,
-        mockResult: const AnalysisResult(
+        mockResult: AnalysisResult(
           isClean: false,
           issues: [
             AnalysisIssue(
@@ -122,7 +112,8 @@ void main() {
                 message: 'Unused import'),
           ],
           rawResult: ExecutableProcessResult(
-              exitCode: 1, stdout: 'warning', stderr: '', durationMs: 10),
+            ProcessResult(0, 1, 'warning', ''),
+          ),
         ),
       );
 
@@ -152,22 +143,17 @@ void main() {
           isValid: true,
           phase: 'REFACTOR',
           message: '100% of tests passed! REFACTOR state verified.',
-          result: ExecutableProcessResult(
-            exitCode: 0,
-            stdout: 'All tests passed',
-            stderr: '',
-            durationMs: 50,
-          ),
         ),
       );
 
       final mockAnalyzer = MockAnalyzer(
         projectDir: harness.tempDir.path,
-        mockResult: const AnalysisResult(
+        mockResult: AnalysisResult(
           isClean: true,
           issues: [],
           rawResult: ExecutableProcessResult(
-              exitCode: 0, stdout: 'No issues', stderr: '', durationMs: 10),
+            ProcessResult(0, 0, 'No issues', ''),
+          ),
         ),
       );
 

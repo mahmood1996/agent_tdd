@@ -76,12 +76,6 @@ void main() {
           phase: 'ALREADY_PASSED',
           message:
               'Tests PASSED! Spec requirement is already satisfied in production code.',
-          result: ExecutableProcessResult(
-            exitCode: 0,
-            stdout: 'All tests passed',
-            stderr: '',
-            durationMs: 50,
-          ),
         ),
       );
 
@@ -121,12 +115,6 @@ void main() {
           phase: 'RED',
           message:
               'Test failed as expected on an assertion failure. RED state verified!',
-          result: ExecutableProcessResult(
-            exitCode: 1,
-            stdout: 'FAIL: Expected true but got false',
-            stderr: '',
-            durationMs: 50,
-          ),
         ),
       );
       final mockGit = MockGitClient(projectDir: harness.tempDir.path);

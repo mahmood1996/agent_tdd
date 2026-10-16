@@ -1,4 +1,4 @@
-import 'executable_process_result.dart';
+import 'package:processes/processes.dart';
 
 final class AnalysisIssue {
   final String severity; // error, warning, info
