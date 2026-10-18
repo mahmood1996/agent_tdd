@@ -1,6 +1,5 @@
-import 'dart:io';
-
 import 'package:agent_tdd/agent_tdd.dart';
+import 'package:agent_tdd/src/core/domain/analysis_result.dart';
 import 'package:test/test.dart';
 
 import '../../helpers/base_test_harness.dart';
@@ -33,13 +32,13 @@ class MockTestRunVerifications extends TestRunVerifications {
   }
 }
 
-class MockAnalyzer extends Analyzer {
+class MockAnalyzer implements Analyzer {
   AnalysisResult mockResult;
 
   MockAnalyzer({
-    required String projectDir,
+    String? projectDir,
     required this.mockResult,
-  }) : super(projectDir: projectDir);
+  });
 
   @override
   Future<AnalysisResult> analysisResult() async => mockResult;
@@ -102,18 +101,8 @@ void main() {
       final mockAnalyzer = MockAnalyzer(
         projectDir: harness.tempDir.path,
         mockResult: AnalysisResult(
-          isClean: false,
-          issues: [
-            AnalysisIssue(
-                file: 'lib/main.dart',
-                line: 10,
-                column: 2,
-                severity: 'warning',
-                message: 'Unused import'),
-          ],
-          rawResult: ExecutableProcessResult(
-            ProcessResult(0, 1, 'warning', ''),
-          ),
+          '  warning • Unused import • lib/main.dart:10:2',
+          isSuccess: false,
         ),
       );
 
@@ -148,13 +137,7 @@ void main() {
 
       final mockAnalyzer = MockAnalyzer(
         projectDir: harness.tempDir.path,
-        mockResult: AnalysisResult(
-          isClean: true,
-          issues: [],
-          rawResult: ExecutableProcessResult(
-            ProcessResult(0, 0, 'No issues', ''),
-          ),
-        ),
+        mockResult: AnalysisResult.clean(),
       );
 
       final useCase = VerifyRefactorUseCase(

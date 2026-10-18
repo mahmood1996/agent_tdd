@@ -1,3 +1,4 @@
+import '../../core/domain/analysis_issue.dart';
 import '../../core/domain/tdd_config.dart';
 import '../../features/complete/usecases/complete_cycle_usecase.dart';
 import '../../features/verify_green/usecases/verify_green_usecase.dart';
