@@ -41,13 +41,11 @@ final class _DefaultAnalysisResult implements AnalysisResult {
   final bool _isSuccess;
   final bool _failOnWarnings;
 
-  late final List<AnalysisIssue> _issues = _issuesDetected();
-
-  @override
-  List<AnalysisIssue> get issues => _issues;
-
   @override
   late final bool isClean = _isClean();
+
+  @override
+  late final List<AnalysisIssue> issues = _issuesDetected();
 
   List<AnalysisIssue> _issuesDetected() {
     final trimmed = _output.trim();
