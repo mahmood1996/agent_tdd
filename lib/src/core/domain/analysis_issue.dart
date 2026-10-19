@@ -24,13 +24,15 @@ abstract interface class AnalysisIssue {
 }
 
 extension SmartAnalysisIssue on AnalysisIssue {
-  Map<String, dynamic> toJson() => {
-        'severity': severity,
-        if (file != null) 'file': file,
-        if (line != null) 'line': line,
-        if (column != null) 'column': column,
-        'message': message,
-      };
+  Map<String, dynamic> toJson() {
+    return {
+      'severity': severity,
+      if (file != null) 'file': file,
+      if (line != null) 'line': line,
+      if (column != null) 'column': column,
+      'message': message,
+    };
+  }
 }
 
 /// Private default implementation of [AnalysisIssue] encapsulating the dispatch table.
@@ -39,17 +41,22 @@ final class _DefaultAnalysisIssue implements AnalysisIssue {
 
   final String _line;
 
-  late final AnalysisIssue _delegate = _resolve();
+  late final AnalysisIssue _delegate = _issue();
 
-  AnalysisIssue _resolve() {
+  AnalysisIssue _issue() {
     final trimmed = _line.trim();
-    return _matchers.entries.map((entry) {
-      final match = entry.key.firstMatch(trimmed);
-      return match != null ? entry.value(match) : null;
-    }).firstWhere(
-      (issue) => issue != null,
-      orElse: () => _SimpleAnalysisIssue(trimmed),
-    )!;
+
+    return _matchers.entries
+        .map(
+          (entry) => switch (entry.key.firstMatch(trimmed)) {
+            null => null,
+            final match => entry.value(match),
+          },
+        )
+        .firstWhere(
+          (issue) => issue != null,
+          orElse: () => _SimpleAnalysisIssue(trimmed),
+        )!;
   }
 
   static final Map<RegExp, AnalysisIssue Function(Match)> _matchers = {

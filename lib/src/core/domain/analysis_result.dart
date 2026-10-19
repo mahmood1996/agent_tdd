@@ -41,15 +41,15 @@ final class _DefaultAnalysisResult implements AnalysisResult {
   final bool _isSuccess;
   final bool _failOnWarnings;
 
-  late final List<AnalysisIssue> _issues = _parseIssues();
+  late final List<AnalysisIssue> _issues = _issuesDetected();
 
   @override
   List<AnalysisIssue> get issues => _issues;
 
   @override
-  late final bool isClean = _computeIsClean();
+  late final bool isClean = _isClean();
 
-  List<AnalysisIssue> _parseIssues() {
+  List<AnalysisIssue> _issuesDetected() {
     final trimmed = _output.trim();
 
     if (trimmed.isEmpty) return const [];
@@ -66,7 +66,7 @@ final class _DefaultAnalysisResult implements AnalysisResult {
         : List.unmodifiable(parsed);
   }
 
-  bool _computeIsClean() {
+  bool _isClean() {
     if (!_isSuccess) return false;
     if (_failOnWarnings) return issues.isEmpty;
     return issues.every((i) => i.severity != 'error');
